@@ -12,7 +12,7 @@
 	<groupId>pe.com.farmaciadey</groupId>
 	<artifactId>usuario</artifactId>
 	<version>0.0.1</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>usuario</name>
 	<description>Demo project for Spring Boot</description>
 	

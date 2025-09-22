@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>businessdomain</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <modules>
         <module>auth</module>
