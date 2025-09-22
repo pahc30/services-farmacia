@@ -8,11 +8,12 @@
     <groupId>pe.com.farmaciadey</groupId>
     <artifactId>businessdomain</artifactId>
     <version>1.0.0</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>pe.com.farmaciadey</groupId>
   <artifactId>usuario</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>usuario</name>
   <description>Usuario microservice</description>
@@ -30,24 +31,31 @@
       <artifactId>spring-boot-starter-data-jpa</artifactId>
     </dependency>
     <dependency>
-      <groupId>mysql</groupId>
+      <groupId>com.mysql</groupId>
       <artifactId>mysql-connector-j</artifactId>
       <scope>runtime</scope>
     </dependency>
 
-    <!-- Validación de DTOs -->
+    <!-- Validación -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
 
-    <!-- Seguridad (solo encripta contraseñas, no fuerza auth en todos los endpoints) -->
+    <!-- Seguridad (encriptación de contraseñas) -->
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-crypto</artifactId>
     </dependency>
 
-    <!-- Opcional: si quieres proteger endpoints con JWT descomenta
+    <!-- Test -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Opcional: para proteger endpoints con JWT, descomenta
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>
@@ -57,6 +65,11 @@
 
   <build>
     <plugins>
+      <!-- Hereda configuración del padre -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
