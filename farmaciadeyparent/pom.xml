@@ -8,7 +8,8 @@
   <groupId>pe.com.farmaciadey</groupId>
   <artifactId>farmaciadeyparent</artifactId>
   <version>1.0.0</version>
-  <packaging>pom</packaging> <!-- 👈 padre como BOM -->
+  <packaging>pom</packaging>
+  <name>farmaciadeyparent</name>
 
   <modules>
     <module>businessdomain</module>
@@ -22,7 +23,7 @@
     <lombok.version>1.18.32</lombok.version>
   </properties>
 
-  <!-- BOM de Spring Boot -->
+  <!-- Importa el BOM de Spring Boot para alinear versiones -->
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -35,7 +36,7 @@
     </dependencies>
   </dependencyManagement>
 
-  <!-- Dependencias comunes (heredables) -->
+  <!-- Dependencias comunes que heredarán los módulos -->
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -44,7 +45,13 @@
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-actuator</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-devtools</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
@@ -59,12 +66,7 @@
       </exclusions>
     </dependency>
 
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-actuator</artifactId>
-    </dependency>
-
-    <!-- Lombok (para getters/setters). Los módulos lo heredan. -->
+    <!-- Lombok para todos los módulos -->
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
@@ -73,11 +75,10 @@
     </dependency>
   </dependencies>
 
-  <!-- Config común de plugins (los hijos la heredan) -->
   <build>
     <pluginManagement>
       <plugins>
-        <!-- Compiler con --release 17 y annotation processing (Lombok) -->
+        <!-- Compilador con release 17 y annotation processing para Lombok -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
@@ -95,18 +96,11 @@
           </configuration>
         </plugin>
 
-        <!-- Plugin de Spring Boot (repackage) -->
+        <!-- Spring Boot repackage (los hijos solo lo declaran sin versión) -->
         <plugin>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-maven-plugin</artifactId>
           <version>${spring.boot.version}</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>repackage</goal>
-              </goals>
-            </execution>
-          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
