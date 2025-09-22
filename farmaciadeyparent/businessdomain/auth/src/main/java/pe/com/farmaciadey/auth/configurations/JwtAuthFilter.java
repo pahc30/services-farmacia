@@ -4,15 +4,15 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 
-import pe.com.farmaciadey.auth.models.responses.DataExceptionResponse;
 import pe.com.farmaciadey.auth.services.JwtService;
 import pe.com.farmaciadey.auth.services.CustomUserDetailsService;
 
@@ -26,72 +26,90 @@ import java.io.IOException;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
+    private final CustomUserDetailsService userDetailsService;
 
-    @Autowired
-    private CustomUserDetailsService userDetailsServiceImpl;
+    public JwtAuthFilter(JwtService jwtService, CustomUserDetailsService userDetailsService) {
+        this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
+    }
+
+    // Si tienes prefijos/paths públicos, déjalos pasar directamente
+    private boolean isWhitelisted(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return path.startsWith("/api/auth/")
+            || path.startsWith("/v3/api-docs")
+            || path.startsWith("/swagger-ui")
+            || path.startsWith("/swagger-resources")
+            || path.startsWith("/webjars");
+    }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain)
             throws IOException, ServletException {
-        String path = request.getRequestURI();
-        if (path.startsWith("/auth/v3/api-docs") || path.startsWith("/auth/swagger-ui")
-                || path.startsWith("/auth/swagger-resources")) {
+
+        // 1) Rutas públicas (sin verificar token)
+        if (isWhitelisted(request)) {
             filterChain.doFilter(request, response);
             return;
         }
 
+        // 2) Si no hay Authorization Bearer, continúa; el Security config decidirá si requiere auth
         String authHeader = request.getHeader("Authorization");
-        String token = null;
-        String username = null;
-
-        DataExceptionResponse exceptionResponse = new DataExceptionResponse();
-
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            try {
-                token = authHeader.substring(7);
-                username = jwtService.extractUsername(token);
-
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username);
-                    if (jwtService.validateToken(token, userDetails)) {
-                        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities());
-                        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                    }
-                }
-
-            } catch (ExpiredJwtException exception) {
-                logger.warn("Request to parse expired JWT. " + exception.getMessage());
-                exceptionResponse.setMensaje("El token ha expirado");
-            } catch (UnsupportedJwtException exception) {
-                logger.warn("Request to parse unsupported JWT ");
-                exceptionResponse.setMensaje("Token no admitido.");
-            } catch (MalformedJwtException exception) {
-                logger.warn("Request to parse invalid JWT. " + exception.getMessage());
-                exceptionResponse.setMensaje("Token no válido.");
-            } catch (SignatureException exception) {
-                logger.warn("Request to parse JWT with invalid signature. " + exception.getMessage());
-                exceptionResponse.setMensaje("Token con firma no válida.");
-            } catch (IllegalArgumentException exception) {
-                logger.warn("Request to parse empty or null JWT." + exception.getMessage());
-                exceptionResponse.setMensaje("Token está vacío.");
-            } finally {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                exceptionResponse.setEstado(-3);
-                request.setAttribute("error", exceptionResponse);
-                filterChain.doFilter(request, response);
-            }
-
-        } else {
-            exceptionResponse.setMensaje("Sin Token");
-            exceptionResponse.setEstado(-3);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            request.setAttribute("error", exceptionResponse);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
+            return;
         }
 
+        String token = authHeader.substring(7);
+        String username;
+
+        try {
+            username = jwtService.extractUsername(token);
+        } catch (ExpiredJwtException e) {
+            logger.warn("JWT expirado: " + e.getMessage());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "El token ha expirado.");
+            return;
+        } catch (UnsupportedJwtException e) {
+            logger.warn("JWT no soportado: " + e.getMessage());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token no admitido.");
+            return;
+        } catch (MalformedJwtException e) {
+            logger.warn("JWT inválido: " + e.getMessage());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token no válido.");
+            return;
+        } catch (SignatureException e) {
+            logger.warn("Firma JWT inválida: " + e.getMessage());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Firma de token no válida.");
+            return;
+        } catch (IllegalArgumentException e) {
+            logger.warn("JWT vacío o nulo: " + e.getMessage());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token vacío.");
+            return;
+        }
+
+        // 3) Si ya hay autenticación en contexto, sigue
+        if (username == null || SecurityContextHolder.getContext().getAuthentication() != null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // 4) Valida token y establece autenticación
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        if (jwtService.validateToken(token, userDetails)) {
+            UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+        } else {
+            // Token no válido → 401
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido.");
+            return;
+        }
+
+        // 5) Continúa cadena
+        filterChain.doFilter(request, response);
     }
 }
