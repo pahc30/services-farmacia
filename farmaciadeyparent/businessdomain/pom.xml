@@ -11,24 +11,15 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <groupId>pe.com.farmaciadey</groupId>
   <artifactId>businessdomain</artifactId>
-  <version>1.0.0</version>
   <packaging>pom</packaging>
   <name>businessdomain</name>
 
   <modules>
     <module>auth</module>
-    <module>usuario</module>
-    <module>producto</module>
-    <module>metodopago</module>
     <module>compra</module>
+    <module>metodopago</module>
+    <module>producto</module>
+    <module>usuario</module>
   </modules>
-
-  <!-- (opcional) Estas deps aquí hacen que TODOS los hijos las hereden -->
-  <properties>
-    <lombok.version>1.18.38</lombok.version>
-    <org.springdoc.version>2.8.9</org.springdoc.version>
-  </properties>
-
 </project>
