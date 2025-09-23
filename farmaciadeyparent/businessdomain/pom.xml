@@ -8,9 +8,9 @@
     <groupId>pe.com.farmaciadey</groupId>
     <artifactId>farmaciadeyparent</artifactId>
     <version>1.0.0</version>
-    <relativePath>../pom.xml</relativePath>
   </parent>
 
+  <groupId>pe.com.farmaciadey</groupId>
   <artifactId>businessdomain</artifactId>
   <version>1.0.0</version>
   <packaging>pom</packaging>
