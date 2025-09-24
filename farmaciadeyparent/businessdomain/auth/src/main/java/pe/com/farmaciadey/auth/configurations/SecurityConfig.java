@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -20,10 +19,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.disable())
+            .cors(cors -> cors.configurationSource(request -> {
+                org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
+                config.setAllowedOrigins(java.util.List.of("http://localhost:4200"));
+                config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                config.setAllowedHeaders(java.util.List.of("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", "*"));
+                config.setExposedHeaders(java.util.List.of("Authorization", "Content-Type"));
+                config.setAllowCredentials(true);
+                return config;
+            }))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
+                    "/auth/api/auth/**",
                     "/api/auth/**",
                     "/v3/api-docs/**",
                     "/swagger-ui/**",
@@ -42,10 +50,6 @@ public class SecurityConfig {
     }
 
     // Asegúrate de que CustomUserDetailsService también tenga @Service, o exponlo como @Bean como aquí:
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return new pe.com.farmaciadey.auth.services.CustomUserDetailsService();
-    }
 
     // Pide el AuthenticationManager ya configurado (Boot arma el DaoAuthenticationProvider internamente)
     @Bean
