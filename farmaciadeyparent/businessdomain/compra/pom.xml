@@ -83,13 +83,30 @@
       </dependency>
   </dependencies>
 
-  <build>
+   <build>
     <plugins>
-      <!-- Boot jar (repackage) -->
+      <!-- Compila para Java 21 (evita bytecode 24) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+        <configuration>
+          <release>21</release>
+        </configuration>
+      </plugin>
+
+      <!-- ESTE es el que hace el jar ejecutable (fat jar) -->
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>${spring-boot.version}</version>
+        <executions>
+          <execution>
+            <goals><goal>repackage</goal></goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
+
   </build>
 </project>
