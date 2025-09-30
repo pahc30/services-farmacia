@@ -1,0 +1,7 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+metodopago,pe.com.farmaciadey.metodopago,MetodopagoApplication,5,3,0,0,2,1,1,1,1,1
+metodopago,pe.com.farmaciadey.metodopago,ServletInitializer,12,0,0,0,2,0,2,0,2,0
+metodopago,pe.com.farmaciadey.metodopago.controllers,MetodoPagoController,148,3,2,0,33,1,6,1,5,1
+metodopago,pe.com.farmaciadey.metodopago.utils,Utils,10,0,0,0,3,0,2,0,2,0
+metodopago,pe.com.farmaciadey.metodopago.models.responses,DataResponse,65,0,0,0,28,0,7,0,7,0
+metodopago,pe.com.farmaciadey.metodopago.services,MetodopagoService,31,59,3,5,8,15,3,9,1,6
