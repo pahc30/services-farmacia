@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 @Entity
 public class CarritoCompra {
+    public CarritoCompra() {}
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Integer id;

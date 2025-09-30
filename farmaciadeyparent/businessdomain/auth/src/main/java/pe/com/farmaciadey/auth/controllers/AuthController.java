@@ -18,9 +18,15 @@ import pe.com.farmaciadey.auth.models.responses.JwtResponse;
 import pe.com.farmaciadey.auth.services.CustomUserDetailsService;
 import pe.com.farmaciadey.auth.services.JwtService;
 
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public void handleIllegalArgument() {}
 
     @Autowired
     private CustomUserDetailsService userService;
@@ -63,22 +69,20 @@ public class AuthController {
                             request.getPassword()));
 
             if (authentication.isAuthenticated()) {
-
                 UserInfo user = userService.findByUsername(request.getUsername());
-
                 if (user != null) {
                     JwtResponse jwtResponse = new JwtResponse();
                     jwtResponse.setAccessToken(jwtService.GenerateToken(request.getUsername()));
                     jwtResponse.setUser(user);
-
-                    return (new ResponseEntity<>(new DataResponse(jwtResponse, Utils.REQUEST_OK), HttpStatus.OK));
+                    return new ResponseEntity<>(new DataResponse(jwtResponse, Utils.REQUEST_OK), HttpStatus.OK);
                 }
             }
+            // Si no está autenticado, devolver 401
+            return new ResponseEntity<>(new DataResponse("Credenciales incorrectas", Utils.REQUEST_ERROR), HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
-            return (new ResponseEntity<>(new DataResponse("Credenciales incorrectas", Utils.REQUEST_ERROR),
-                    HttpStatus.OK));
+            // Si ocurre excepción, devolver 401
+            return new ResponseEntity<>(new DataResponse("Credenciales incorrectas", Utils.REQUEST_ERROR), HttpStatus.UNAUTHORIZED);
         }
-        return (new ResponseEntity<>(new DataResponse("Credenciales incorrectas", Utils.REQUEST_ERROR), HttpStatus.OK));
     }
 
 }

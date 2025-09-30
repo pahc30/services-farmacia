@@ -11,6 +11,18 @@ import pe.com.farmaciadey.metodopago.repository.MetodopagoRepository;
 
 @Service
 public class MetodopagoService {
+    public double calcularComision(String tipo, double monto) {
+        switch (tipo.toUpperCase()) {
+            case "TARJETA":
+                return monto * 0.039;
+            case "YAPE":
+                return monto * 0.025;
+            case "EFECTIVO":
+                return 0.0;
+            default:
+                return 0.0;
+        }
+    }
     @Autowired
     private MetodopagoRepository repository;
 

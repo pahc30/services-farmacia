@@ -1,14 +1,25 @@
 package pe.com.farmaciadey.compra.models.responses;
 
 import pe.com.farmaciadey.compra.utils.Utils;
-
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Data
-public class DataResponse {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class DataResponse implements java.io.Serializable {
+    @JsonProperty("dato")
     private Object dato;
+    @JsonProperty("mensaje")
     private String mensaje;
+    @JsonProperty("estado")
     private Integer estado;
+
+    public Object getDato() { return dato; }
+    public void setDato(Object dato) { this.dato = dato; }
+    public String getMensaje() { return mensaje; }
+    public void setMensaje(String mensaje) { this.mensaje = mensaje; }
+    public Integer getEstado() { return estado; }
+    public void setEstado(Integer estado) { this.estado = estado; }
 
     public DataResponse() {
         this.estado = Utils.REQUEST_OK;

@@ -37,13 +37,21 @@ import reactor.netty.http.client.HttpClient;
 
 @RestController
 @RequestMapping("/api/carrito")
+
 public class CarritoCompraController {
+
+    public CarritoCompraController() {}
+
+    public CarritoCompraController(CarritoCompraService service, WebClient.Builder webClientBuilder) {
+        this.service = service;
+        this.webClientBuilder = webClientBuilder;
+    }
 
     @Autowired
     CarritoCompraService service;
 
     @Autowired
-    private WebClient.Builder webClientBuilder;
+    WebClient.Builder webClientBuilder;
 
     HttpClient client = HttpClient.create()
             .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
@@ -56,8 +64,8 @@ public class CarritoCompraController {
                 connection.addHandlerLast(new WriteTimeoutHandler(5000, TimeUnit.MILLISECONDS));
             });
 
-    @PostMapping(value = "/save")
-    public ResponseEntity<Object> save(@RequestBody CarritoCompra request) throws Exception {
+    @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<DataResponse> save(@RequestBody CarritoCompra request) throws Exception {
         DataResponse response = new DataResponse();
         try {
 
@@ -81,8 +89,8 @@ public class CarritoCompraController {
         }
     }
 
-    @PostMapping(value = "/list/{usuarioId}")
-    public ResponseEntity<Object> list(@PathVariable("usuarioId") Integer usuarioId) throws Exception {
+    @PostMapping(value = "/list/{usuarioId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<DataResponse> list(@PathVariable("usuarioId") Integer usuarioId) throws Exception {
         DataResponse response = new DataResponse();
         try {
             List<CarritoCompra> data = service.listByUsuario(usuarioId);
@@ -104,8 +112,8 @@ public class CarritoCompraController {
         }
     }
 
-    @PostMapping(value = "/delete/{id}")
-    public ResponseEntity<Object> delete(@PathVariable("id") Integer id) throws Exception {
+    @PostMapping(value = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<DataResponse> delete(@PathVariable("id") Integer id) throws Exception {
         DataResponse response = new DataResponse();
         try {
             response.setDato(service.delete(id));
@@ -116,7 +124,7 @@ public class CarritoCompraController {
         }
     }
 
-    private ProductoResponse getProducto(Integer id) {
+    ProductoResponse getProducto(Integer id) {
         // String baseUrlService = "http://BUSINESSDOMAIN-PRODUCT/producto";
         WebClient build = webClientBuilder.clientConnector(new ReactorClientHttpConnector(client))
                 .baseUrl(Utils.BASE_URL_PRODUCTO)
