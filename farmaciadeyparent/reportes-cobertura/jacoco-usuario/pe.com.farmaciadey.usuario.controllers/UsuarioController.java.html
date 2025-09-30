@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UsuarioController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">usuario</a> &gt; <a href="index.source.html" class="el_package">pe.com.farmaciadey.usuario.controllers</a> &gt; <span class="el_source">UsuarioController.java</span></div><h1>UsuarioController.java</h1><pre class="source lang-java linenums">package pe.com.farmaciadey.usuario.controllers;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import pe.com.farmaciadey.usuario.models.Usuario;
+import pe.com.farmaciadey.usuario.models.responses.DataResponse;
+import pe.com.farmaciadey.usuario.services.UsuarioService;
+
+@RestController
+@RequestMapping(&quot;/api/usuario&quot;)
+<span class="fc" id="L18">public class UsuarioController {</span>
+
+    @Autowired
+    UsuarioService service;
+
+    @PostMapping(value = &quot;/save&quot;)
+    public ResponseEntity&lt;Object&gt; save(@RequestBody Usuario request) throws Exception {
+<span class="nc" id="L25">        DataResponse response = new DataResponse();</span>
+        try {
+<span class="nc" id="L27">            response.setDato(service.save(request));</span>
+<span class="nc" id="L28">            return new ResponseEntity&lt;&gt;(response, HttpStatus.CREATED);</span>
+<span class="nc" id="L29">        } catch (Exception e) {</span>
+<span class="nc" id="L30">            response.setException(e.getMessage());</span>
+<span class="nc" id="L31">            return new ResponseEntity&lt;&gt;(response, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    @PostMapping(value = &quot;/update/{id}&quot;)
+    public ResponseEntity&lt;Object&gt; update(@PathVariable(&quot;id&quot;) Integer id, @RequestBody Usuario request)
+            throws Exception {
+<span class="nc" id="L38">        DataResponse response = new DataResponse();</span>
+        try {
+<span class="nc bnc" id="L40" title="All 2 branches missed.">            if (id != request.getId()) {</span>
+<span class="nc" id="L41">                response.setException(&quot;No se pudo actualizar el registro&quot;);</span>
+<span class="nc" id="L42">                return new ResponseEntity&lt;&gt;(response, HttpStatus.BAD_REQUEST);</span>
+            }
+            
+<span class="nc" id="L45">            response.setDato(service.update(request));</span>
+<span class="nc" id="L46">            return new ResponseEntity&lt;&gt;(response, HttpStatus.OK);</span>
+<span class="nc" id="L47">        } catch (Exception e) {</span>
+<span class="nc" id="L48">            response.setException(e.getMessage());</span>
+<span class="nc" id="L49">            return new ResponseEntity&lt;&gt;(response, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    @PostMapping(value = &quot;/list&quot;)
+    public ResponseEntity&lt;Object&gt; list() throws Exception {
+<span class="nc" id="L55">        DataResponse response = new DataResponse();</span>
+        try {
+<span class="nc" id="L57">            response.setDato(service.list());</span>
+<span class="nc" id="L58">            return new ResponseEntity&lt;&gt;(response, HttpStatus.OK);</span>
+<span class="nc" id="L59">        } catch (Exception e) {</span>
+<span class="nc" id="L60">            response.setException(e.getMessage());</span>
+<span class="nc" id="L61">            return new ResponseEntity&lt;&gt;(response, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    @PostMapping(value = &quot;/find/{id}&quot;)
+    public ResponseEntity&lt;Object&gt; find(@PathVariable(&quot;id&quot;) Integer id) throws Exception {
+<span class="nc" id="L67">        DataResponse response = new DataResponse();</span>
+        try {
+<span class="nc" id="L69">            response.setDato(service.find(id));</span>
+<span class="nc" id="L70">            return new ResponseEntity&lt;&gt;(response, HttpStatus.OK);</span>
+<span class="nc" id="L71">        } catch (Exception e) {</span>
+<span class="nc" id="L72">            response.setException(e.getMessage());</span>
+<span class="nc" id="L73">            return new ResponseEntity&lt;&gt;(response, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    @PostMapping(value = &quot;/delete/{id}&quot;)
+    public ResponseEntity&lt;Object&gt; delete(@PathVariable(&quot;id&quot;) Integer id) throws Exception {
+<span class="nc" id="L79">        DataResponse response = new DataResponse();</span>
+        try {
+<span class="nc" id="L81">            response.setDato(service.delete(id));</span>
+<span class="nc" id="L82">            return new ResponseEntity&lt;&gt;(response, HttpStatus.OK);</span>
+<span class="nc" id="L83">        } catch (Exception e) {</span>
+<span class="nc" id="L84">            response.setException(e.getMessage());</span>
+<span class="nc" id="L85">            return new ResponseEntity&lt;&gt;(response, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
