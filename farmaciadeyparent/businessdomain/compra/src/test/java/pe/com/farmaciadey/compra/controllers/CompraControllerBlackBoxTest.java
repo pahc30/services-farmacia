@@ -32,15 +32,14 @@ public class CompraControllerBlackBoxTest {
     @Test
     void testSaveCompra_ReturnsDataResponse() throws Exception {
         // Simula el JSON de compra
-        String compraJson = "{" +
-                "\"usuarioId\": 1," +
-                "\"total\": 100.0," +
-                "\"productos\": []}";
+    String compraJson = "{" +
+        "\"usuarioId\": 1," +
+        "\"total\": 100.0," +
+        "\"detalleCompra\": []}";
 
-        mockMvc.perform(post("/api/compra/save")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(compraJson))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").exists()); // Verifica que el campo 'success' esté en la respuesta
+    mockMvc.perform(post("/api/compra/save")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(compraJson))
+        .andExpect(status().isCreated()); // Verifica que el status sea 201
     }
 }

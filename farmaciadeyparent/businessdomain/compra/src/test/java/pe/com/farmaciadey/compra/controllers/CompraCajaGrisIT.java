@@ -19,7 +19,6 @@ class CompraCajaGrisIT {
     @Test
     void testCrearYListarCompra() {
         Compra compra = new Compra();
-        compra.setEstado("Caja Gris");
         compra.setTotal(100.0);
         compra.setEliminado(0);
 

@@ -23,6 +23,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class CarritoCompraControllerTest {
 
+    @Test
+    void testSaveCarritoCompra_NullProducto() throws Exception {
+        CarritoCompra carrito = new CarritoCompra();
         carrito.setProductoId(2);
         carrito.setCantidad(3);
         CarritoCompraController spyController = Mockito.spy(controller);
