@@ -1,0 +1,116 @@
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for pe.com.farmaciadey:auth:jar:0.0.1
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: org.springframework.boot:spring-boot-starter-test:jar -> duplicate declaration of version (?) @ line 101, column 15
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: com.h2database:h2:jar -> duplicate declaration of version (?) @ line 123, column 15
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for pe.com.farmaciadey:metodopago:jar:0.0.1
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: org.springframework.boot:spring-boot-starter-test:jar -> duplicate declaration of version (?) @ line 85, column 21
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: com.h2database:h2:jar -> duplicate declaration of version (?) @ line 107, column 15
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for pe.com.farmaciadey:producto:jar:0.0.1
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: org.springframework.boot:spring-boot-starter-test:jar -> duplicate declaration of version (?) @ line 85, column 19
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: com.h2database:h2:jar -> duplicate declaration of version (?) @ line 107, column 15
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for pe.com.farmaciadey:usuario:jar:0.0.1
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: org.springframework.boot:spring-boot-starter-test:jar -> duplicate declaration of version (?) @ line 90, column 15
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: com.h2database:h2:jar -> duplicate declaration of version (?) @ line 112, column 15
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] 
+[INFO] --------------------< pe.com.farmaciadey:producto >---------------------
+[INFO] Building producto 0.0.1
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.5.6:run (default-cli) > test-compile @ producto >>>
+[INFO] 
+[INFO] --- jacoco:0.8.12:prepare-agent (default) @ producto ---
+[INFO] argLine set to "-javaagent:/Users/pablohuerta/.m2/repository/org/jacoco/org.jacoco.agent/0.8.12/org.jacoco.agent-0.8.12-runtime.jar=destfile=/Users/pablohuerta/Documents/UTP/Ciclo_09/Integrador II/services-farmacia/farmaciadeyparent/businessdomain/producto/target/jacoco.exec"
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ producto ---
+[INFO] Copying 3 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ producto ---
+[INFO] Recompiling the module because of added or removed source files.
+[INFO] Compiling 14 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ producto ---
+[INFO] skip non existing resourceDirectory /Users/pablohuerta/Documents/UTP/Ciclo_09/Integrador II/services-farmacia/farmaciadeyparent/businessdomain/producto/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ producto ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 4 source files with javac [debug release 21] to target/test-classes
+[WARNING] /Users/pablohuerta/Documents/UTP/Ciclo_09/Integrador II/services-farmacia/farmaciadeyparent/businessdomain/producto/src/test/java/pe/com/farmaciadey/producto/controllers/ProductoControllerBlackBoxTest.java:[21,6] org.springframework.boot.test.mock.mockito.MockBean in org.springframework.boot.test.mock.mockito has been deprecated and marked for removal
+[WARNING] /Users/pablohuerta/Documents/UTP/Ciclo_09/Integrador II/services-farmacia/farmaciadeyparent/businessdomain/producto/src/test/java/pe/com/farmaciadey/producto/controllers/ProductoControllerBlackBoxTest.java:[21,6] org.springframework.boot.test.mock.mockito.MockBean in org.springframework.boot.test.mock.mockito has been deprecated and marked for removal
+[WARNING] /Users/pablohuerta/Documents/UTP/Ciclo_09/Integrador II/services-farmacia/farmaciadeyparent/businessdomain/producto/src/test/java/pe/com/farmaciadey/producto/controllers/ProductoControllerBlackBoxTest.java:[21,6] org.springframework.boot.test.mock.mockito.MockBean in org.springframework.boot.test.mock.mockito has been deprecated and marked for removal
+[WARNING] /Users/pablohuerta/Documents/UTP/Ciclo_09/Integrador II/services-farmacia/farmaciadeyparent/businessdomain/producto/src/test/java/pe/com/farmaciadey/producto/controllers/ProductoControllerBlackBoxTest.java:[21,6] org.springframework.boot.test.mock.mockito.MockBean in org.springframework.boot.test.mock.mockito has been deprecated and marked for removal
+[WARNING] /Users/pablohuerta/Documents/UTP/Ciclo_09/Integrador II/services-farmacia/farmaciadeyparent/businessdomain/producto/src/test/java/pe/com/farmaciadey/producto/controllers/ProductoControllerBlackBoxTest.java:[21,6] org.springframework.boot.test.mock.mockito.MockBean in org.springframework.boot.test.mock.mockito has been deprecated and marked for removal
+[INFO] 
+[INFO] <<< spring-boot:3.5.6:run (default-cli) < test-compile @ producto <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.5.6:run (default-cli) @ producto ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.6)
+
+2025-10-29T14:57:45.456-05:00  INFO 77083 --- [businessdomain-producto] [           main] p.c.f.producto.ProductoApplication       : Starting ProductoApplication using Java 21.0.7 with PID 77083 (/Users/pablohuerta/Documents/UTP/Ciclo_09/Integrador II/services-farmacia/farmaciadeyparent/businessdomain/producto/target/classes started by pablohuerta in /Users/pablohuerta/Documents/UTP/Ciclo_09/Integrador II/services-farmacia/farmaciadeyparent/businessdomain/producto)
+2025-10-29T14:57:45.457-05:00  INFO 77083 --- [businessdomain-producto] [           main] p.c.f.producto.ProductoApplication       : The following 1 profile is active: "local"
+2025-10-29T14:57:45.898-05:00  INFO 77083 --- [businessdomain-producto] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-10-29T14:57:45.968-05:00  INFO 77083 --- [businessdomain-producto] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 65 ms. Found 2 JPA repository interfaces.
+2025-10-29T14:57:46.176-05:00  INFO 77083 --- [businessdomain-producto] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 7013 (http)
+2025-10-29T14:57:46.183-05:00  INFO 77083 --- [businessdomain-producto] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-10-29T14:57:46.184-05:00  INFO 77083 --- [businessdomain-producto] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.46]
+2025-10-29T14:57:46.206-05:00  INFO 77083 --- [businessdomain-producto] [           main] o.a.c.c.C.[.[localhost].[/producto]      : Initializing Spring embedded WebApplicationContext
+2025-10-29T14:57:46.207-05:00  INFO 77083 --- [businessdomain-producto] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 734 ms
+2025-10-29T14:57:46.308-05:00  INFO 77083 --- [businessdomain-producto] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-10-29T14:57:46.336-05:00  INFO 77083 --- [businessdomain-producto] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.29.Final
+2025-10-29T14:57:46.353-05:00  INFO 77083 --- [businessdomain-producto] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-10-29T14:57:46.482-05:00  INFO 77083 --- [businessdomain-producto] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-10-29T14:57:46.496-05:00  INFO 77083 --- [businessdomain-producto] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-10-29T14:57:46.585-05:00  INFO 77083 --- [businessdomain-producto] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@186dcb05
+2025-10-29T14:57:46.586-05:00  INFO 77083 --- [businessdomain-producto] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-10-29T14:57:46.611-05:00  WARN 77083 --- [businessdomain-producto] [           main] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-10-29T14:57:46.611-05:00  WARN 77083 --- [businessdomain-producto] [           main] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-10-29T14:57:46.618-05:00  INFO 77083 --- [businessdomain-producto] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-10-29T14:57:46.971-05:00  INFO 77083 --- [businessdomain-producto] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-10-29T14:57:47.059-05:00  INFO 77083 --- [businessdomain-producto] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-10-29T14:57:47.158-05:00  INFO 77083 --- [businessdomain-producto] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-10-29T14:57:47.479-05:00  WARN 77083 --- [businessdomain-producto] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-10-29T14:57:47.693-05:00  INFO 77083 --- [businessdomain-producto] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 13 endpoints beneath base path '/actuator'
+2025-10-29T14:57:47.749-05:00  INFO 77083 --- [businessdomain-producto] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 7013 (http) with context path '/producto'
+2025-10-29T14:57:47.758-05:00  INFO 77083 --- [businessdomain-producto] [           main] p.c.f.producto.ProductoApplication       : Started ProductoApplication in 2.464 seconds (process running for 2.608)
+Hibernate: select c1_0.id,c1_0.descripcion,c1_0.eliminado,c1_0.nombre from Categoria c1_0
+Hibernate: insert into Categoria (descripcion,eliminado,nombre) values (?,?,?)
+✅ Categoría Medicamentos creada
+Hibernate: select c1_0.id,c1_0.descripcion,c1_0.eliminado,c1_0.nombre from Categoria c1_0
+Hibernate: insert into Categoria (descripcion,eliminado,nombre) values (?,?,?)
+✅ Categoría Cuidado Personal creada
+Hibernate: select p1_0.id,p1_0.categoria_id,p1_0.codigo,p1_0.descripcion,p1_0.eliminado,p1_0.nombre,p1_0.precio,p1_0.stock,p1_0.url from Producto p1_0 join Categoria c1_0 on c1_0.id=p1_0.categoria_id where p1_0.eliminado=0 and c1_0.eliminado=0
+Hibernate: select c1_0.id,c1_0.descripcion,c1_0.eliminado,c1_0.nombre from Categoria c1_0 where c1_0.id=?
+Hibernate: select c1_0.id,c1_0.descripcion,c1_0.eliminado,c1_0.nombre from Categoria c1_0 where c1_0.id=?
+✅ Productos ya existen en la base de datos
+2025-10-29T15:01:54.005-05:00  INFO 77083 --- [businessdomain-producto] [nio-7013-exec-6] o.a.c.c.C.[.[localhost].[/producto]      : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-10-29T15:01:54.015-05:00  INFO 77083 --- [businessdomain-producto] [nio-7013-exec-6] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-10-29T15:01:54.047-05:00  INFO 77083 --- [businessdomain-producto] [nio-7013-exec-6] o.s.web.servlet.DispatcherServlet        : Completed initialization in 31 ms
+Hibernate: select p1_0.id,p1_0.categoria_id,p1_0.codigo,p1_0.descripcion,p1_0.eliminado,p1_0.nombre,p1_0.precio,p1_0.stock,p1_0.url from Producto p1_0 join Categoria c1_0 on c1_0.id=p1_0.categoria_id where p1_0.eliminado=0 and c1_0.eliminado=0
+Hibernate: select c1_0.id,c1_0.descripcion,c1_0.eliminado,c1_0.nombre from Categoria c1_0 where c1_0.id=?
+Hibernate: select c1_0.id,c1_0.descripcion,c1_0.eliminado,c1_0.nombre from Categoria c1_0 where c1_0.id=?

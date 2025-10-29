@@ -17,6 +17,7 @@
   <name>businessdomain</name>
 
   <modules>
+    <module>appgw</module>
     <module>auth</module>
     <module>compra</module>
     <module>metodopago</module>
