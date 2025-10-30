@@ -14,11 +14,28 @@ import pe.com.farmaciadey.usuario.models.responses.DataResponse;
 import pe.com.farmaciadey.usuario.services.UsuarioService;
 
 @RestController
-@RequestMapping("/api/usuario")
+@RequestMapping("/api/usuarios")
 public class UsuarioController {
 
     @Autowired
     UsuarioService service;
+
+    @PostMapping(value = "/registrar")
+    public ResponseEntity<Object> registrar(@RequestBody Usuario request) throws Exception {
+        DataResponse response = new DataResponse();
+        try {
+            Usuario usuarioCreado = service.save(request);
+            response.setEstado(1);
+            response.setMensaje("Usuario registrado exitosamente");
+            response.setDato(usuarioCreado);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (Exception e) {
+            response.setEstado(0);
+            response.setMensaje("Error al registrar usuario: " + e.getMessage());
+            response.setException(e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @PostMapping(value = "/save")
     public ResponseEntity<Object> save(@RequestBody Usuario request) throws Exception {

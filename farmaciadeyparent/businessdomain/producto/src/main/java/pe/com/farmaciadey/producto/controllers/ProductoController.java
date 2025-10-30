@@ -150,6 +150,18 @@ public class ProductoController {
         }
     }
 
+    @PostMapping(value = "/search", consumes = "text/plain")
+    public ResponseEntity<Object> search(@RequestBody String searchTerm) throws Exception {
+        DataResponse response = new DataResponse();
+        try {
+            response.setDato(service.search(searchTerm));
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setException(e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping(value = "/find/{id}")
     public ResponseEntity<Object> find(@PathVariable("id") Integer id) throws Exception {
         DataResponse response = new DataResponse();

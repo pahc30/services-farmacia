@@ -12,4 +12,6 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer> {
     public List<Producto> list();
     @Query("SELECT o FROM Producto o WHERE o.id = ?1")
     public Producto find(Integer id);
+    @Query("SELECT o FROM Producto o WHERE eliminado = 0 AND o.categoria.eliminado = 0 AND (LOWER(o.nombre) LIKE LOWER(CONCAT('%', ?1, '%')) OR LOWER(o.descripcion) LIKE LOWER(CONCAT('%', ?1, '%')))")
+    public List<Producto> search(String searchTerm);
 }

@@ -63,5 +63,9 @@ public class ProductoService {
     public Producto find(Integer id){
         return repository.find(id);
     }
+    
+    public List<Producto> search(String searchTerm) {
+        return repository.search(searchTerm);
+    }
 }
 
