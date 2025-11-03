@@ -1,0 +1,204 @@
+package pe.com.farmaciadey.metodopago.services;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import pe.com.farmaciadey.metodopago.models.TransaccionPago;
+import pe.com.farmaciadey.metodopago.models.requests.PaymentIntentRequest;
+import pe.com.farmaciadey.metodopago.models.responses.PaymentIntentResponse;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
+
+/**
+ * Servicio de pagos simulados para desarrollo y demos
+ * NO usar en producción real con dinero
+ * Sistema completamente GRATUITO para pruebas
+ */
+@Slf4j
+@Service
+public class SimulatedPaymentService {
+
+    private final Random random = new Random();
+    
+    public PaymentIntentResponse createPaymentIntent(PaymentIntentRequest request) {
+        log.info("🎭 Creando pago SIMULADO para compra: {}, monto: {}", 
+                request.getCompraId(), request.getMonto());
+        
+        // Simular delay de procesamiento
+        try {
+            Thread.sleep(1000 + random.nextInt(2000)); // 1-3 segundos
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        
+        // Generar ID de transacción simulado
+        String simulatedId = "sim_" + UUID.randomUUID().toString().substring(0, 8);
+        String clientSecret = "pi_" + UUID.randomUUID().toString().replace("-", "") + "_secret_sim";
+        
+        // 85% de probabilidad de éxito (para simular fallos reales)
+        boolean success = random.nextDouble() > 0.15;
+        
+        if (success) {
+            log.info("✅ Pago simulado EXITOSO: {}", simulatedId);
+            return PaymentIntentResponse.builder()
+                    .success(true)
+                    .transaccionId(null) // Se asignará después
+                    .clientSecret(clientSecret)
+                    .stripePaymentIntentId(simulatedId)
+                    .message("Pago simulado creado exitosamente")
+                    .build();
+        } else {
+            log.warn("❌ Pago simulado FALLIDO: {}", simulatedId);
+            return PaymentIntentResponse.builder()
+                    .success(false)
+                    .transaccionId(null)
+                    .clientSecret(null)
+                    .message("Error simulado: Tarjeta rechazada por el banco")
+                    .build();
+        }
+    }
+    
+    public boolean confirmarPago(String paymentIntentId) {
+        log.info("🎭 Confirmando pago SIMULADO: {}", paymentIntentId);
+        
+        // Simular delay
+        try {
+            Thread.sleep(500 + random.nextInt(1000));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        
+        // 90% de confirmaciones exitosas
+        boolean confirmed = random.nextDouble() > 0.1;
+        
+        if (confirmed) {
+            log.info("✅ Confirmación simulada EXITOSA: {}", paymentIntentId);
+        } else {
+            log.warn("❌ Confirmación simulada FALLIDA: {}", paymentIntentId);
+        }
+        
+        return confirmed;
+    }
+    
+    /**
+     * Sobrecarga para aceptar Long ID
+     */
+    public boolean confirmarPago(Long transaccionId) {
+        return confirmarPago(transaccionId.toString());
+    }
+    
+    public TransaccionPago.EstadoTransaccion obtenerEstadoPago(String paymentIntentId) {
+        log.info("🎭 Obteniendo estado SIMULADO: {}", paymentIntentId);
+        
+        // Simular diferentes estados basado en el ID
+        int hash = paymentIntentId.hashCode();
+        int estado = Math.abs(hash) % 6;
+        
+        return switch (estado) {
+            case 0 -> TransaccionPago.EstadoTransaccion.PENDIENTE;
+            case 1 -> TransaccionPago.EstadoTransaccion.PROCESANDO;
+            case 2, 3, 4 -> TransaccionPago.EstadoTransaccion.COMPLETADA; // Más probable
+            case 5 -> TransaccionPago.EstadoTransaccion.FALLIDA;
+            default -> TransaccionPago.EstadoTransaccion.PENDIENTE;
+        };
+    }
+    
+    /**
+     * Sobrecarga para aceptar Long ID
+     */
+    public Map<String, Object> obtenerEstadoPago(Long transaccionId) {
+        TransaccionPago.EstadoTransaccion estado = obtenerEstadoPago(transaccionId.toString());
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("transaccionId", transaccionId);
+        response.put("estado", estado.toString());
+        response.put("provider", "SIMULADO");
+        response.put("timestamp", System.currentTimeMillis());
+        
+        return response;
+    }
+    
+    /**
+     * Obtener transacciones por compra ID
+     */
+    public Map<String, Object> obtenerTransaccionesPorCompra(Long compraId) {
+        log.info("🎭 Obteniendo transacciones SIMULADAS para compra: {}", compraId);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("compraId", compraId);
+        response.put("provider", "SIMULADO");
+        response.put("transacciones", new Object[]{
+            Map.of(
+                "id", compraId * 1000 + 1,
+                "estado", "COMPLETADA",
+                "monto", 25.50,
+                "fecha", "2025-11-03T10:30:00"
+            )
+        });
+        response.put("total_transacciones", 1);
+        
+        return response;
+    }
+    
+    public String getProviderName() {
+        return "SIMULADO";
+    }
+    
+    public boolean isAvailable() {
+        return true; // Siempre disponible
+    }
+    
+    /**
+     * Método para simular diferentes tipos de errores (útil para testing)
+     */
+    public PaymentIntentResponse simularError(String tipoError) {
+        return switch (tipoError.toLowerCase()) {
+            case "tarjeta_rechazada" -> PaymentIntentResponse.builder()
+                    .success(false)
+                    .message("Error simulado: Su tarjeta ha sido rechazada")
+                    .build();
+                    
+            case "fondos_insuficientes" -> PaymentIntentResponse.builder()
+                    .success(false)
+                    .message("Error simulado: Fondos insuficientes")
+                    .build();
+                    
+            case "tarjeta_expirada" -> PaymentIntentResponse.builder()
+                    .success(false)
+                    .message("Error simulado: Tarjeta expirada")
+                    .build();
+                    
+            case "conexion" -> PaymentIntentResponse.builder()
+                    .success(false)
+                    .message("Error simulado: Problema de conexión con el banco")
+                    .build();
+                    
+            default -> PaymentIntentResponse.builder()
+                    .success(false)
+                    .message("Error simulado: Error desconocido")
+                    .build();
+        };
+    }
+    
+    /**
+     * Generar datos de prueba para testing
+     */
+    public static class DatosPrueba {
+        public static final String TARJETA_EXITOSA = "4242424242424242";
+        public static final String TARJETA_RECHAZADA = "4000000000000002";
+        public static final String TARJETA_FONDOS_INSUFICIENTES = "4000000000009995";
+        public static final String TARJETA_EXPIRADA = "4000000000000069";
+        
+        public static String getDescripcionTarjeta(String numero) {
+            return switch (numero) {
+                case TARJETA_EXITOSA -> "Tarjeta de prueba - Siempre exitosa";
+                case TARJETA_RECHAZADA -> "Tarjeta de prueba - Siempre rechazada";
+                case TARJETA_FONDOS_INSUFICIENTES -> "Tarjeta de prueba - Fondos insuficientes";
+                case TARJETA_EXPIRADA -> "Tarjeta de prueba - Expirada";
+                default -> "Tarjeta de prueba - Resultado aleatorio";
+            };
+        }
+    }
+}
