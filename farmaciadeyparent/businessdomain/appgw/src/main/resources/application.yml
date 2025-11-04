@@ -48,6 +48,12 @@ spring:
           predicates:
             - Path=/compra/**
 
+# Configuración de logging para reducir warnings DNS en macOS
+logging:
+  level:
+    "[io.netty.resolver.dns.DnsServerAddressStreamProviders]": WARN
+    "[io.netty.resolver.dns.macos]": WARN
+
 management:
   endpoints:
     web:

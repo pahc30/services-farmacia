@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import pe.com.farmaciadey.producto.models.Producto;
 import pe.com.farmaciadey.producto.models.responses.DataResponse;
@@ -198,11 +197,8 @@ public class ProductoController {
         try (InputStream inputStream = file) {
             Files.copy(file, Paths.get(uploadDir + "/" + fileName), StandardCopyOption.REPLACE_EXISTING);
 
-            // Retornar la URL de acceso al archivo
-            String fileUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/api/producto/")
-                    .path(fileName)
-                    .toUriString();
+            // Retornar la URL de acceso al archivo a través del gateway
+            String fileUrl = "http://localhost:9000/producto/api/producto/" + fileName;
 
             return fileUrl;
         } catch (IOException e) {
@@ -218,8 +214,29 @@ public class ProductoController {
             Resource resource = new UrlResource(filePath.toUri());
 
             if (resource.exists() || resource.isReadable()) {
+                // Detectar el tipo de contenido basado en la extensión del archivo
+                String contentType = "application/octet-stream";
+                String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+                
+                switch (fileExtension) {
+                    case "jpg":
+                    case "jpeg":
+                        contentType = "image/jpeg";
+                        break;
+                    case "png":
+                        contentType = "image/png";
+                        break;
+                    case "gif":
+                        contentType = "image/gif";
+                        break;
+                    case "webp":
+                        contentType = "image/webp";
+                        break;
+                }
+                
                 return ResponseEntity.status(HttpStatus.OK)
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                        .header(HttpHeaders.CONTENT_TYPE, contentType)
+                        .header(HttpHeaders.CACHE_CONTROL, "max-age=3600")
                         .body(resource);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

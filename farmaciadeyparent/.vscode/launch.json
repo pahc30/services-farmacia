@@ -51,6 +51,16 @@
             "projectName": "usuario",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-AppGatewayApplication<appgw>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "pe.com.farmaciadey.appgw.AppGatewayApplication",
+            "projectName": "appgw",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }

@@ -9,6 +9,9 @@ import pe.com.farmaciadey.compra.models.Compra;
 
 
 public interface CompraRepository extends JpaRepository<Compra, Integer> {
-    @Query("SELECT o FROM Compra o WHERE eliminado = 0 AND usuarioId = ?1 ORDER BY o.fecha DESC")
+    @Query("SELECT DISTINCT o FROM Compra o LEFT JOIN FETCH o.detalleCompra WHERE o.eliminado = 0 AND o.usuarioId = ?1 ORDER BY o.fecha DESC")
     List<Compra> list(Integer usuarioId);
+    
+    @Query("SELECT MAX(o.id) FROM Compra o")
+    Long findMaxId();
 }

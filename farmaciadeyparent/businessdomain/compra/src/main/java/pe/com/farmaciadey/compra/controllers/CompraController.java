@@ -1,7 +1,6 @@
 package pe.com.farmaciadey.compra.controllers;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,7 +36,7 @@ public class CompraController {
         DataResponse response = new DataResponse();
         try {
 
-            request.setCodigo(UUID.randomUUID().toString());
+            request.setCodigo(service.generarCodigoCompra());
             request.setSubtotal(0.0);
             request.getDetalleCompra().forEach(x -> {               
                 

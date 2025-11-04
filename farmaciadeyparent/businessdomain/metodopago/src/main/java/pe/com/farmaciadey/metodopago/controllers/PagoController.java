@@ -67,7 +67,7 @@ public class PagoController {
      * Confirmar un pago simulado
      */
     @PostMapping("/confirmar/{transaccionId}")
-    public ResponseEntity<?> confirmarPago(@PathVariable Long transaccionId) {
+    public ResponseEntity<?> confirmarPago(@PathVariable("transaccionId") Long transaccionId) {
         try {
             log.info("✅ Confirmando pago simulado para transacción: {}", transaccionId);
 
@@ -102,7 +102,7 @@ public class PagoController {
      * Obtener estado de una transacción
      */
     @GetMapping("/transaccion/{transaccionId}")
-    public ResponseEntity<?> obtenerEstadoTransaccion(@PathVariable Long transaccionId) {
+    public ResponseEntity<?> obtenerEstadoTransaccion(@PathVariable("transaccionId") Long transaccionId) {
         try {
             log.info("🔍 Consultando estado de transacción: {}", transaccionId);
 
@@ -119,7 +119,7 @@ public class PagoController {
      * Obtener todas las transacciones de una compra
      */
     @GetMapping("/compra/{compraId}")
-    public ResponseEntity<?> obtenerTransaccionesPorCompra(@PathVariable Long compraId) {
+    public ResponseEntity<?> obtenerTransaccionesPorCompra(@PathVariable("compraId") Long compraId) {
         try {
             log.info("🔍 Consultando transacciones para compra: {}", compraId);
 
@@ -136,7 +136,7 @@ public class PagoController {
      * Descargar boleta de venta en PDF por ID de transacción
      */
     @GetMapping("/boleta/transaccion/{transaccionId}")
-    public ResponseEntity<?> descargarBoletaPorTransaccion(@PathVariable Long transaccionId) {
+    public ResponseEntity<?> descargarBoletaPorTransaccion(@PathVariable("transaccionId") Long transaccionId) {
         try {
             log.info("📄 Generando boleta PDF para transacción: {}", transaccionId);
 
@@ -172,7 +172,7 @@ public class PagoController {
      * Descargar boleta de venta en PDF por ID de compra
      */
     @GetMapping("/boleta/compra/{compraId}")
-    public ResponseEntity<?> descargarBoletaPorCompra(@PathVariable Long compraId) {
+    public ResponseEntity<?> descargarBoletaPorCompra(@PathVariable("compraId") Long compraId) {
         try {
             log.info("📄 Generando boleta PDF para compra: {}", compraId);
 
@@ -237,7 +237,7 @@ public class PagoController {
      * Endpoint para testing - simular diferentes tipos de errores
      */
     @PostMapping("/test/simular-error/{tipoError}")
-    public ResponseEntity<?> simularError(@PathVariable String tipoError) {
+    public ResponseEntity<?> simularError(@PathVariable("tipoError") String tipoError) {
         try {
             log.info("🧪 Simulando error tipo: {}", tipoError);
             
