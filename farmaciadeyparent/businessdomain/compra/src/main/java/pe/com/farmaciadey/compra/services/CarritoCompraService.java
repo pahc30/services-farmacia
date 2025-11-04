@@ -38,4 +38,13 @@ public class CarritoCompraService {
         }
         return false;
     }
+
+    public boolean clearCarrito(Integer usuarioId){
+        List<CarritoCompra> carritos = repository.list(usuarioId);
+        for(CarritoCompra carrito : carritos){
+            carrito.setEliminado(1);
+            repository.save(carrito);
+        }
+        return true;
+    }
 }

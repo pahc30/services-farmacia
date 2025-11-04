@@ -124,6 +124,18 @@ public class CarritoCompraController {
         }
     }
 
+    @PostMapping(value = "/clear/{usuarioId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<DataResponse> clearCarrito(@PathVariable("usuarioId") Integer usuarioId) throws Exception {
+        DataResponse response = new DataResponse();
+        try {
+            response.setDato(service.clearCarrito(usuarioId));
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setException(e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     ProductoResponse getProducto(Integer id) {
         // String baseUrlService = "http://BUSINESSDOMAIN-PRODUCT/producto";
         WebClient build = webClientBuilder.clientConnector(new ReactorClientHttpConnector(client))

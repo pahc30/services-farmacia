@@ -45,8 +45,11 @@ public class UsuarioService {
             usuario.setDireccion(o.getDireccion());
             usuario.setRol(o.getRol());
             
-            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            usuario.setPassword(passwordEncoder.encode(o.getPassword()));
+            // Solo actualizar la contraseña si se proporciona una nueva
+            if(o.getPassword() != null && !o.getPassword().isEmpty()){
+                BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+                usuario.setPassword(passwordEncoder.encode(o.getPassword()));
+            }
 
             return repository.save(usuario);
         }
