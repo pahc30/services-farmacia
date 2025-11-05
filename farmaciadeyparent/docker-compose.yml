@@ -1,0 +1,143 @@
+# Docker Compose for local development and testing with PostgreSQL
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  farmacia-db:
+    image: postgres:15-alpine
+    container_name: farmacia-postgres
+    environment:
+      POSTGRES_DB: farmaciadb
+      POSTGRES_USER: farmacia
+      POSTGRES_PASSWORD: farmacia123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U farmacia -d farmaciadb"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Auth Service
+  farmacia-auth:
+    build:
+      context: .
+      dockerfile: businessdomain/auth/Dockerfile
+    container_name: farmacia-auth
+    environment:
+      - SPRING_PROFILES_ACTIVE=render
+      - DATABASE_URL=jdbc:postgresql://farmacia-db:5432/farmaciadb?user=farmacia&password=farmacia123
+      - JWT_SECRET=local-development-secret-key-very-long-and-secure
+      - CORS_ALLOWED_ORIGINS=http://localhost:4200,http://localhost:3000
+    ports:
+      - "7011:7011"
+    depends_on:
+      farmacia-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:7011/auth/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Usuario Service
+  farmacia-usuario:
+    build:
+      context: .
+      dockerfile: businessdomain/usuario/Dockerfile
+    container_name: farmacia-usuario
+    environment:
+      - SPRING_PROFILES_ACTIVE=render
+      - DATABASE_URL=jdbc:postgresql://farmacia-db:5432/farmaciadb?user=farmacia&password=farmacia123
+      - CORS_ALLOWED_ORIGINS=http://localhost:4200,http://localhost:3000
+      - AUTH_SERVICE_URL=http://farmacia-auth:7011
+    ports:
+      - "7012:7012"
+    depends_on:
+      farmacia-db:
+        condition: service_healthy
+
+  # Producto Service
+  farmacia-producto:
+    build:
+      context: .
+      dockerfile: businessdomain/producto/Dockerfile
+    container_name: farmacia-producto
+    environment:
+      - SPRING_PROFILES_ACTIVE=render
+      - DATABASE_URL=jdbc:postgresql://farmacia-db:5432/farmaciadb?user=farmacia&password=farmacia123
+      - CORS_ALLOWED_ORIGINS=http://localhost:4200,http://localhost:3000
+      - AUTH_SERVICE_URL=http://farmacia-auth:7011
+    ports:
+      - "7013:7013"
+    depends_on:
+      farmacia-db:
+        condition: service_healthy
+
+  # MetodoPago Service
+  farmacia-metodopago:
+    build:
+      context: .
+      dockerfile: businessdomain/metodopago/Dockerfile
+    container_name: farmacia-metodopago
+    environment:
+      - SPRING_PROFILES_ACTIVE=render
+      - DATABASE_URL=jdbc:postgresql://farmacia-db:5432/farmaciadb?user=farmacia&password=farmacia123
+      - CORS_ALLOWED_ORIGINS=http://localhost:4200,http://localhost:3000
+      - AUTH_SERVICE_URL=http://farmacia-auth:7011
+      - PAYMENT_PROVIDER=simulado
+    ports:
+      - "7014:7014"
+    depends_on:
+      farmacia-db:
+        condition: service_healthy
+
+  # Compra Service
+  farmacia-compra:
+    build:
+      context: .
+      dockerfile: businessdomain/compra/Dockerfile
+    container_name: farmacia-compra
+    environment:
+      - SPRING_PROFILES_ACTIVE=render
+      - DATABASE_URL=jdbc:postgresql://farmacia-db:5432/farmaciadb?user=farmacia&password=farmacia123
+      - CORS_ALLOWED_ORIGINS=http://localhost:4200,http://localhost:3000
+      - AUTH_SERVICE_URL=http://farmacia-auth:7011
+    ports:
+      - "7015:7015"
+    depends_on:
+      farmacia-db:
+        condition: service_healthy
+
+  # Gateway Service
+  farmacia-gateway:
+    build:
+      context: .
+      dockerfile: businessdomain/appgw/Dockerfile
+    container_name: farmacia-gateway
+    environment:
+      - SPRING_PROFILES_ACTIVE=render
+      - CORS_ALLOWED_ORIGINS=http://localhost:4200,http://localhost:3000
+      - JWT_SECRET=local-development-secret-key-very-long-and-secure
+      - AUTH_SERVICE_URL=http://farmacia-auth:7011
+      - USUARIO_SERVICE_URL=http://farmacia-usuario:7012
+      - PRODUCTO_SERVICE_URL=http://farmacia-producto:7013
+      - METODOPAGO_SERVICE_URL=http://farmacia-metodopago:7014
+      - COMPRA_SERVICE_URL=http://farmacia-compra:7015
+    ports:
+      - "9000:9000"
+    depends_on:
+      - farmacia-auth
+      - farmacia-usuario
+      - farmacia-producto
+      - farmacia-metodopago
+      - farmacia-compra
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    name: farmacia-network
