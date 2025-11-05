@@ -7,7 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.mockito.Mockito;
 import pe.com.farmaciadey.auth.models.responses.JwtResponse;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import pe.com.farmaciadey.auth.services.CustomUserDetailsService;
@@ -24,13 +24,13 @@ public class AuthControllerBlackBoxTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private CustomUserDetailsService userService;
 
-    @MockBean
+    @MockitoBean
     private AuthenticationManager authenticationManager;
 
-    @MockBean
+    @MockitoBean
     private JwtService jwtService;
 
     @Autowired
