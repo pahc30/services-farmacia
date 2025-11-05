@@ -3,7 +3,7 @@ package pe.com.farmaciadey.auth.web;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,9 +21,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = AuthController.class)
 class AuthControllerExtraTest {
     @Autowired private MockMvc mvc;
-    @MockBean private AuthenticationManager authenticationManager;
-    @MockBean private CustomUserDetailsService userService;
-    @MockBean private JwtService jwtService;
+    @MockitoBean private AuthenticationManager authenticationManager;
+    @MockitoBean private CustomUserDetailsService userService;
+    @MockitoBean private JwtService jwtService;
 
     @Test
     void usuarioRegistrar_usernameExistente_retornaError() throws Exception {

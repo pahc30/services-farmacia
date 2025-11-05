@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "payment.provider",
+      "type": "java.lang.String",
+      "description": "Proveedor de pagos a utilizar (simulado, stripe, mercadopago)",
+      "defaultValue": "simulado"
+    }
+  ]
+}

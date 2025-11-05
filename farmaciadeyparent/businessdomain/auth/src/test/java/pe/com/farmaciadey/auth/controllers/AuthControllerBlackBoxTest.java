@@ -1,11 +1,9 @@
 package pe.com.farmaciadey.auth.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.mockito.Mockito;
-import pe.com.farmaciadey.auth.models.responses.JwtResponse;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
@@ -33,9 +31,6 @@ public class AuthControllerBlackBoxTest {
     @MockitoBean
     private JwtService jwtService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @Test
     void testRegisterUser_ReturnsJwtResponse() throws Exception {
     // Simula el JSON de registro
@@ -45,10 +40,6 @@ public class AuthControllerBlackBoxTest {
         "\"email\": \"test@example.com\"}";
 
     // Simula el comportamiento del servicio
-    JwtResponse jwtResponse = JwtResponse.builder()
-        .accessToken("mocked-jwt-token")
-        .user(null)
-        .build();
     Mockito.when(jwtService.GenerateToken(Mockito.anyString())).thenReturn("mocked-jwt-token");
 
     // Simula el registro de usuario

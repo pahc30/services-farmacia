@@ -3,7 +3,7 @@ package pe.com.farmaciadey.metodopago.web;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -11,14 +11,14 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import pe.com.farmaciadey.metodopago.controllers.MetodopagoController;
+import pe.com.farmaciadey.metodopago.controllers.MetodoPagoController;
 import pe.com.farmaciadey.metodopago.services.MetodopagoService;
 
-@WebMvcTest(controllers = MetodopagoController.class)
+@WebMvcTest(controllers = MetodoPagoController.class)
 class MetodopagoControllerTest {
 
   @Autowired private MockMvc mvc;
-  @MockBean private MetodopagoService service;
+  @MockitoBean private MetodopagoService service;
 
   @Test
   void calcular_ok_200() throws Exception {

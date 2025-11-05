@@ -20,6 +20,7 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("unchecked")
 class CompraIntegrationServiceTest {
     @Mock
     private Builder webClientBuilder;
@@ -71,7 +72,6 @@ class CompraIntegrationServiceTest {
 
     @Test
     void testGetProductoReturnsNull() {
-    ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
     // Simula que el método get("dato") retorna null
     JsonNode mockNode = mock(JsonNode.class);
     when(mockNode.get("dato")).thenReturn(null);
