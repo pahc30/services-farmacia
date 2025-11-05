@@ -1,0 +1,46 @@
+{
+  "properties": [
+    {
+      "name": "jwt.secret",
+      "type": "java.lang.String",
+      "description": "Secret key para JWT",
+      "defaultValue": "my-secret-key"
+    },
+    {
+      "name": "jwt.expiration",
+      "type": "java.lang.Long",
+      "description": "Tiempo de expiracion del JWT en milisegundos",
+      "defaultValue": 86400000
+    },
+    {
+      "name": "cors.allowed-origins",
+      "type": "java.util.List",
+      "description": "Origenes permitidos para CORS",
+      "defaultValue": ["http://localhost:4200"]
+    },
+    {
+      "name": "cors.allowed-methods",
+      "type": "java.util.List",
+      "description": "Metodos HTTP permitidos para CORS",
+      "defaultValue": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    },
+    {
+      "name": "cors.allowed-headers",
+      "type": "java.util.List",
+      "description": "Headers permitidos para CORS",
+      "defaultValue": ["*"]
+    },
+    {
+      "name": "cors.exposed-headers",
+      "type": "java.util.List",
+      "description": "Headers expuestos para CORS",
+      "defaultValue": ["*"]
+    },
+    {
+      "name": "cors.allow-credentials",
+      "type": "java.lang.Boolean",
+      "description": "Permitir credenciales en CORS",
+      "defaultValue": true
+    }
+  ]
+}

@@ -1,12 +1,6 @@
 {
   "properties": [
     {
-      "name": "payment.provider",
-      "type": "java.lang.String",
-      "description": "Proveedor de pagos a utilizar (simulado, stripe, mercadopago)",
-      "defaultValue": "simulado"
-    },
-    {
       "name": "spring.webflux.cors.allowed-origins",
       "type": "java.util.List",
       "description": "Origenes permitidos para WebFlux CORS",

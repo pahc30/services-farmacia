@@ -1,12 +1,6 @@
 {
   "properties": [
     {
-      "name": "payment.provider",
-      "type": "java.lang.String",
-      "description": "Proveedor de pagos a utilizar (simulado, stripe, mercadopago)",
-      "defaultValue": "simulado"
-    },
-    {
       "name": "spring.webflux.cors.allowed-origins",
       "type": "java.util.List",
       "description": "Origenes permitidos para WebFlux CORS",
@@ -41,6 +35,18 @@
       "type": "java.lang.String",
       "description": "URL del servicio de autenticacion",
       "defaultValue": "http://localhost:8081"
+    },
+    {
+      "name": "springdoc.swagger-ui.path",
+      "type": "java.lang.String",
+      "description": "Ruta de Swagger UI",
+      "defaultValue": "/swagger-ui.html"
+    },
+    {
+      "name": "springdoc.swagger-ui.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Habilitar Swagger UI",
+      "defaultValue": true
     }
   ]
 }
