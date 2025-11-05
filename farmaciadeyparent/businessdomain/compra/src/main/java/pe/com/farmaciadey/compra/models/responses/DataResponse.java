@@ -1,7 +1,6 @@
 package pe.com.farmaciadey.compra.models.responses;
 
 import pe.com.farmaciadey.compra.utils.Utils;
-import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 

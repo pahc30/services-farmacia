@@ -7,10 +7,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 import pe.com.farmaciadey.compra.models.Compra;
-import pe.com.farmaciadey.compra.models.DetalleCompra;
 import pe.com.farmaciadey.compra.repository.CompraRepository;
 
-import java.util.Collections;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
