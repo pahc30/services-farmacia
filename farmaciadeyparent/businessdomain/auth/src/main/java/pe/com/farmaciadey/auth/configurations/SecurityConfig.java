@@ -28,7 +28,13 @@ public class SecurityConfig {
         http
             .cors(cors -> cors.configurationSource(request -> {
                 CorsConfiguration config = new CorsConfiguration();
-                config.setAllowedOriginPatterns(List.of("http://localhost:*", "http://127.0.0.1:*", "https://tu-frontend.com"));
+                config.setAllowedOriginPatterns(List.of(
+                    "http://localhost:*", 
+                    "http://127.0.0.1:*", 
+                    "https://*.onrender.com",
+                    "https://*.vercel.app",
+                    "https://*.netlify.app"
+                ));
                 config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                 config.setAllowedHeaders(List.of("*"));
                 config.setExposedHeaders(List.of("Authorization", "Content-Type"));
@@ -68,7 +74,13 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOriginPatterns(List.of("http://localhost:*", "http://127.0.0.1:*", "https://tu-frontend.com"));
+        config.setAllowedOriginPatterns(List.of(
+            "http://localhost:*", 
+            "http://127.0.0.1:*", 
+            "https://*.onrender.com",
+            "https://*.vercel.app",
+            "https://*.netlify.app"
+        ));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
         config.setExposedHeaders(List.of("Authorization"));

@@ -7,8 +7,13 @@ import com.itextpdf.text.pdf.PdfWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 import pe.com.farmaciadey.metodopago.models.TransaccionPago;
+import pe.com.farmaciadey.metodopago.models.Metodopago;
 import pe.com.farmaciadey.metodopago.repository.TransaccionPagoRepository;
+import pe.com.farmaciadey.metodopago.repository.MetodopagoRepository;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
@@ -26,6 +31,17 @@ public class PdfBoletaService {
 
     @Autowired
     private TransaccionPagoRepository transaccionRepository;
+    
+    @Autowired
+    private MetodopagoRepository metodopagoRepository;
+
+    private final WebClient webClient;
+    private final ObjectMapper objectMapper;
+
+    public PdfBoletaService() {
+        this.webClient = WebClient.builder().build();
+        this.objectMapper = new ObjectMapper();
+    }
 
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,##0.00");
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
@@ -33,7 +49,9 @@ public class PdfBoletaService {
     /**
      * Genera una boleta PDF para una transacción específica
      */
-    public byte[] generarBoletaPdf(Long transaccionId) throws Exception {
+    public byte[] generarBoletaPorTransaccion(Long transaccionId) throws Exception {
+        log.info("🔍 Generando boleta para transacción: {}", transaccionId);
+        
         Optional<TransaccionPago> transaccionOpt = transaccionRepository.findById(transaccionId);
         
         if (transaccionOpt.isEmpty()) {
@@ -46,13 +64,19 @@ public class PdfBoletaService {
             throw new RuntimeException("Solo se pueden generar boletas para transacciones completadas");
         }
 
-        return generarPdfInterno(transaccion);
+        // Obtener información de la compra relacionada
+        JsonNode compraInfo = obtenerInformacionCompra(transaccion.getCompraId());
+        
+        return generarPdfInterno(transaccion, compraInfo);
     }
 
     /**
      * Genera una boleta PDF por ID de compra
      */
     public byte[] generarBoletaPorCompra(Long compraId) throws Exception {
+        // Obtener información de la compra desde el microservicio de compras
+        JsonNode compraInfo = obtenerInformacionCompra(compraId);
+        
         // Primero intentar encontrar una transacción completada
         Optional<TransaccionPago> transaccionOpt = transaccionRepository
                 .findByCompraIdAndEstado(compraId, TransaccionPago.EstadoTransaccion.COMPLETADA);
@@ -62,27 +86,92 @@ public class PdfBoletaService {
             List<TransaccionPago> transacciones = transaccionRepository.findByCompraId(compraId);
             if (transacciones.isEmpty()) {
                 // Si no hay transacciones, crear una transacción simulada para la boleta
-                TransaccionPago transaccionSimulada = createSimulatedTransaction(compraId);
-                return generarPdfInterno(transaccionSimulada);
+                TransaccionPago transaccionSimulada = createSimulatedTransaction(compraId, compraInfo);
+                return generarPdfInterno(transaccionSimulada, compraInfo);
             }
             // Tomar la primera transacción disponible
             transaccionOpt = Optional.of(transacciones.get(0));
         }
 
-        return generarPdfInterno(transaccionOpt.get());
+        return generarPdfInterno(transaccionOpt.get(), compraInfo);
+    }
+
+    /**
+     * Obtiene información detallada de la compra desde el microservicio de compras
+     */
+    private JsonNode obtenerInformacionCompra(Long compraId) {
+        try {
+            log.info("🔄 Obteniendo información de compra: {}", compraId);
+            
+            String response = webClient.post()
+                .uri("http://farmacia-compra:7015/compra/api/compra/find/" + compraId)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+            
+            JsonNode responseNode = objectMapper.readTree(response);
+            if (responseNode.has("dato") && !responseNode.get("dato").isNull()) {
+                JsonNode compraData = responseNode.get("dato");
+                log.info("✅ Información de compra obtenida: ID {}", compraId);
+                return compraData;
+            }
+            
+            log.warn("⚠️ No se encontró información de compra para ID: {}", compraId);
+            return objectMapper.createObjectNode();
+            
+        } catch (Exception e) {
+            log.error("❌ Error obteniendo información de compra {}: {}", compraId, e.getMessage());
+            return objectMapper.createObjectNode();
+        }
+    }
+
+    /**
+     * Obtiene información del usuario desde el microservicio de usuarios
+     */
+    private JsonNode obtenerInformacionUsuario(Long usuarioId) {
+        try {
+            log.info("🔄 Obteniendo información de usuario: {}", usuarioId);
+            
+            String response = webClient.post()
+                .uri("http://farmacia-usuario:7012/usuario/api/usuarios/find/" + usuarioId)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+            
+            JsonNode responseNode = objectMapper.readTree(response);
+            if (responseNode.has("dato") && !responseNode.get("dato").isNull()) {
+                JsonNode userData = responseNode.get("dato");
+                log.info("✅ Información de usuario obtenida: ID {}", usuarioId);
+                return userData;
+            }
+            
+            log.warn("⚠️ No se encontró información de usuario para ID: {}", usuarioId);
+            return objectMapper.createObjectNode();
+            
+        } catch (Exception e) {
+            log.error("❌ Error obteniendo información de usuario {}: {}", usuarioId, e.getMessage());
+            return objectMapper.createObjectNode();
+        }
     }
 
     /**
      * Crea una transacción simulada para generar boletas de compras sin proceso de pago
      */
-    private TransaccionPago createSimulatedTransaction(Long compraId) {
+    private TransaccionPago createSimulatedTransaction(Long compraId, JsonNode compraInfo) {
         log.info("🔄 Creando transacción simulada para compra: {}", compraId);
         
         TransaccionPago transaccionSimulada = new TransaccionPago();
         transaccionSimulada.setId(999999L + compraId); // ID simulado único
         transaccionSimulada.setCompraId(compraId);
         transaccionSimulada.setMetodoPagoId(1L); // Método de pago por defecto
-        transaccionSimulada.setMonto(BigDecimal.valueOf(100.00)); // Monto por defecto
+        
+        // Obtener el total real de la compra si está disponible
+        BigDecimal montoReal = BigDecimal.valueOf(100.00); // Valor por defecto
+        if (compraInfo.has("total") && !compraInfo.get("total").isNull()) {
+            montoReal = new BigDecimal(compraInfo.get("total").asText());
+        }
+        
+        transaccionSimulada.setMonto(montoReal);
         transaccionSimulada.setMoneda("PEN");
         transaccionSimulada.setEstado(TransaccionPago.EstadoTransaccion.COMPLETADA);
         transaccionSimulada.setDescripcion("Compra en Farmacia DeY - Boleta generada sin transacción de pago");
@@ -93,7 +182,7 @@ public class PdfBoletaService {
         return transaccionSimulada;
     }
 
-    private byte[] generarPdfInterno(TransaccionPago transaccion) throws Exception {
+    private byte[] generarPdfInterno(TransaccionPago transaccion, JsonNode compraInfo) throws Exception {
         log.info("📄 Generando boleta PDF para transacción: {}", transaccion.getId());
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -126,17 +215,17 @@ public class PdfBoletaService {
         document.add(new Paragraph(" ")); // Espacio
         
         // Información del cliente y transacción
-        agregarInformacionCliente(document, transaccion, normalFont);
+        agregarInformacionCliente(document, transaccion, compraInfo, normalFont);
         
         document.add(new Paragraph(" ")); // Espacio
         
         // Tabla de productos/servicios
-        agregarTablaProductos(document, transaccion, headerFont, normalFont);
+        agregarTablaProductos(document, transaccion, compraInfo, headerFont, normalFont);
         
         document.add(new Paragraph(" ")); // Espacio
         
         // Totales
-        agregarTotales(document, transaccion, headerFont, normalFont);
+        agregarTotales(document, transaccion, compraInfo, headerFont, normalFont);
         
         document.add(new Paragraph(" ")); // Espacio
         
@@ -175,30 +264,54 @@ public class PdfBoletaService {
         document.add(headerTable);
     }
 
-    private void agregarInformacionCliente(Document document, TransaccionPago transaccion, Font normalFont) throws DocumentException {
+    private void agregarInformacionCliente(Document document, TransaccionPago transaccion, JsonNode compraInfo, Font normalFont) throws DocumentException {
         PdfPTable infoTable = new PdfPTable(4);
         infoTable.setWidthPercentage(100);
         infoTable.setWidths(new float[]{1, 2, 1, 2});
         
+        // Obtener información del usuario desde la compra
+        String nombreCliente = "Cliente General";
+        String metodoPago = "Efectivo";
+        
+        if (compraInfo != null && compraInfo.has("usuarioId")) {
+            try {
+                Long usuarioId = compraInfo.get("usuarioId").asLong();
+                JsonNode usuarioInfo = obtenerInformacionUsuario(usuarioId);
+                
+                if (usuarioInfo != null && usuarioInfo.has("nombre") && usuarioInfo.has("apellido")) {
+                    nombreCliente = usuarioInfo.get("nombre").asText() + " " + usuarioInfo.get("apellido").asText();
+                }
+            } catch (Exception e) {
+                log.warn("No se pudo obtener información del usuario: {}", e.getMessage());
+            }
+        }
+        
+        // Obtener método de pago real
+        try {
+            if (transaccion.getMetodoPagoId() != null) {
+                Optional<Metodopago> metodoOpt = metodopagoRepository.findById(transaccion.getMetodoPagoId().intValue());
+                if (metodoOpt.isPresent()) {
+                    metodoPago = metodoOpt.get().getTipo();
+                }
+            }
+        } catch (Exception e) {
+            log.warn("No se pudo obtener información del método de pago: {}", e.getMessage());
+        }
+        
         infoTable.addCell(new PdfPCell(new Phrase("Fecha:", normalFont)));
         infoTable.addCell(new PdfPCell(new Phrase(transaccion.getFechaCreacion().format(DATE_FORMATTER), normalFont)));
-        infoTable.addCell(new PdfPCell(new Phrase("Compra ID:", normalFont)));
-        infoTable.addCell(new PdfPCell(new Phrase(transaccion.getCompraId().toString(), normalFont)));
-        
         infoTable.addCell(new PdfPCell(new Phrase("Cliente:", normalFont)));
-        infoTable.addCell(new PdfPCell(new Phrase("Cliente General", normalFont)));
-        infoTable.addCell(new PdfPCell(new Phrase("Método Pago:", normalFont)));
-        infoTable.addCell(new PdfPCell(new Phrase("Pago Simulado", normalFont)));
+        infoTable.addCell(new PdfPCell(new Phrase(nombreCliente, normalFont)));
         
+        infoTable.addCell(new PdfPCell(new Phrase("Método Pago:", normalFont)));
+        infoTable.addCell(new PdfPCell(new Phrase(metodoPago, normalFont)));
         infoTable.addCell(new PdfPCell(new Phrase("Transacción:", normalFont)));
         infoTable.addCell(new PdfPCell(new Phrase(transaccion.getReferenciaExterna() != null ? transaccion.getReferenciaExterna() : transaccion.getId().toString(), normalFont)));
-        infoTable.addCell(new PdfPCell(new Phrase("Estado:", normalFont)));
-        infoTable.addCell(new PdfPCell(new Phrase(transaccion.getEstado().toString(), normalFont)));
         
         document.add(infoTable);
     }
 
-    private void agregarTablaProductos(Document document, TransaccionPago transaccion, Font headerFont, Font normalFont) throws DocumentException {
+    private void agregarTablaProductos(Document document, TransaccionPago transaccion, JsonNode compraInfo, Font headerFont, Font normalFont) throws DocumentException {
         PdfPTable productTable = new PdfPTable(5);
         productTable.setWidthPercentage(100);
         productTable.setWidths(new float[]{3, 1, 2, 2, 2});
@@ -210,24 +323,59 @@ public class PdfBoletaService {
         productTable.addCell(new PdfPCell(new Phrase("Descuento", headerFont)));
         productTable.addCell(new PdfPCell(new Phrase("Importe", headerFont)));
         
-        // Datos del producto (simulado - en una implementación real vendría de la compra)
-        productTable.addCell(new PdfPCell(new Phrase(transaccion.getDescripcion() != null ? transaccion.getDescripcion() : "Compra en Farmacia DeY", normalFont)));
-        productTable.addCell(new PdfPCell(new Phrase("1", normalFont)));
-        productTable.addCell(new PdfPCell(new Phrase(DECIMAL_FORMAT.format(transaccion.getMonto()), normalFont)));
-        productTable.addCell(new PdfPCell(new Phrase("0.00", normalFont)));
-        productTable.addCell(new PdfPCell(new Phrase(DECIMAL_FORMAT.format(transaccion.getMonto()), normalFont)));
+        // Obtener productos reales de la compra
+        if (compraInfo != null && compraInfo.has("detalles") && compraInfo.get("detalles").isArray()) {
+            for (JsonNode detalle : compraInfo.get("detalles")) {
+                String descripcion = "Producto";
+                String cantidad = "1";
+                String precioUnitario = "0.00";
+                String descuento = "0.00";
+                String importe = "0.00";
+                
+                if (detalle.has("producto") && detalle.get("producto").has("nombre")) {
+                    descripcion = detalle.get("producto").get("nombre").asText();
+                }
+                if (detalle.has("cantidad")) {
+                    cantidad = detalle.get("cantidad").asText();
+                }
+                if (detalle.has("precioUnitario")) {
+                    precioUnitario = DECIMAL_FORMAT.format(detalle.get("precioUnitario").asDouble());
+                }
+                if (detalle.has("subtotal")) {
+                    importe = DECIMAL_FORMAT.format(detalle.get("subtotal").asDouble());
+                }
+                
+                productTable.addCell(new PdfPCell(new Phrase(descripcion, normalFont)));
+                productTable.addCell(new PdfPCell(new Phrase(cantidad, normalFont)));
+                productTable.addCell(new PdfPCell(new Phrase(precioUnitario, normalFont)));
+                productTable.addCell(new PdfPCell(new Phrase(descuento, normalFont)));
+                productTable.addCell(new PdfPCell(new Phrase(importe, normalFont)));
+            }
+        } else {
+            // Fallback si no hay información de productos
+            productTable.addCell(new PdfPCell(new Phrase(transaccion.getDescripcion() != null ? transaccion.getDescripcion() : "Compra en Farmacia DeY", normalFont)));
+            productTable.addCell(new PdfPCell(new Phrase("1", normalFont)));
+            productTable.addCell(new PdfPCell(new Phrase(DECIMAL_FORMAT.format(transaccion.getMonto()), normalFont)));
+            productTable.addCell(new PdfPCell(new Phrase("0.00", normalFont)));
+            productTable.addCell(new PdfPCell(new Phrase(DECIMAL_FORMAT.format(transaccion.getMonto()), normalFont)));
+        }
         
         document.add(productTable);
     }
 
-    private void agregarTotales(Document document, TransaccionPago transaccion, Font headerFont, Font normalFont) throws DocumentException {
+    private void agregarTotales(Document document, TransaccionPago transaccion, JsonNode compraInfo, Font headerFont, Font normalFont) throws DocumentException {
         PdfPTable totalsTable = new PdfPTable(2);
         totalsTable.setWidthPercentage(60);
         totalsTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
         
-        BigDecimal montoTransaccion = transaccion.getMonto();
-        BigDecimal subtotal = montoTransaccion.divide(new BigDecimal("1.18"), 2, java.math.RoundingMode.HALF_UP); // Asumiendo IGV 18%
-        BigDecimal igv = montoTransaccion.subtract(subtotal);
+        // Obtener el total real de la compra si está disponible
+        BigDecimal montoTotal = transaccion.getMonto();
+        if (compraInfo != null && compraInfo.has("total") && !compraInfo.get("total").isNull()) {
+            montoTotal = new BigDecimal(compraInfo.get("total").asText());
+        }
+        
+        BigDecimal subtotal = montoTotal.divide(new BigDecimal("1.18"), 2, java.math.RoundingMode.HALF_UP); // IGV 18%
+        BigDecimal igv = montoTotal.subtract(subtotal);
         
         totalsTable.addCell(new PdfPCell(new Phrase("Sub Total:", normalFont)));
         totalsTable.addCell(new PdfPCell(new Phrase("S/ " + DECIMAL_FORMAT.format(subtotal), normalFont)));
@@ -242,7 +390,7 @@ public class PdfBoletaService {
         totalLabelCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
         totalsTable.addCell(totalLabelCell);
         
-        PdfPCell totalValueCell = new PdfPCell(new Phrase("S/ " + DECIMAL_FORMAT.format(montoTransaccion), headerFont));
+        PdfPCell totalValueCell = new PdfPCell(new Phrase("S/ " + DECIMAL_FORMAT.format(montoTotal), headerFont));
         totalValueCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
         totalsTable.addCell(totalValueCell);
         

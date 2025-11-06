@@ -2,6 +2,7 @@ package pe.com.farmaciadey.producto.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import pe.com.farmaciadey.producto.models.Categoria;
@@ -10,6 +11,7 @@ import pe.com.farmaciadey.producto.repository.CategoriaRepository;
 import pe.com.farmaciadey.producto.repository.ProductoRepository;
 
 @Component
+@Profile("!render")
 public class DataInitializer implements CommandLineRunner {
 
     @Autowired

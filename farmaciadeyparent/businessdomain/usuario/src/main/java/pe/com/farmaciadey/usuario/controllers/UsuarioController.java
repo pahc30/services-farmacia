@@ -103,4 +103,21 @@ public class UsuarioController {
         }
     }
 
+    @PostMapping(value = "/saveWithAuth")
+    public ResponseEntity<Object> saveWithAuth(@RequestBody Usuario request) throws Exception {
+        DataResponse response = new DataResponse();
+        try {
+            Usuario usuarioCreado = service.saveWithAuth(request);
+            response.setEstado(1);
+            response.setMensaje("Usuario y credenciales creados exitosamente");
+            response.setDato(usuarioCreado);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (Exception e) {
+            response.setEstado(0);
+            response.setMensaje("Error al crear usuario con credenciales: " + e.getMessage());
+            response.setException(e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

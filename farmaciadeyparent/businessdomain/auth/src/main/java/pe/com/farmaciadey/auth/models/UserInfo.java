@@ -11,7 +11,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "Usuario")
+@Table(name = "AuthUser", schema = "auth_schema")
 public class UserInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

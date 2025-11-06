@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.http.MediaType;
 
 import pe.com.farmaciadey.usuario.models.Usuario;
 import pe.com.farmaciadey.usuario.repository.UsuarioRepository;
@@ -69,5 +71,38 @@ public class UsuarioService {
 
     public Usuario find(Integer id){
         return repository.find(id);
+    }
+
+    public Usuario saveWithAuth(Usuario usuario) throws Exception {
+        // Primero guardamos el usuario en el servicio de usuarios
+        Usuario usuarioCreado = save(usuario);
+        
+        // Luego creamos las credenciales en el servicio de auth
+        try {
+            WebClient webClient = WebClient.builder().build();
+            
+            // Preparar los datos para el servicio auth
+            String authRequest = String.format(
+                "{\"username\":\"%s\",\"password\":\"%s\",\"rol\":\"%s\"}",
+                usuario.getUsername(),
+                usuario.getPassword(), // Enviar password sin encriptar para auth
+                usuario.getRol()
+            );
+            
+            // Llamar al servicio auth
+            webClient.post()
+                .uri("http://farmacia-auth:7011/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(authRequest)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+            
+            return usuarioCreado;
+        } catch (Exception e) {
+            // Si falla la creación en auth, eliminar el usuario creado
+            delete(usuarioCreado.getId());
+            throw new Exception("Error al crear credenciales de autenticación: " + e.getMessage());
+        }
     }
 }

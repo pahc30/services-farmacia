@@ -4,19 +4,8 @@ FROM eclipse-temurin:21-jdk-alpine AS builder
 # Set working directory
 WORKDIR /app
 
-# Copy Maven wrapper and pom files
-COPY mvnw mvnw.cmd ./
-COPY .mvn .mvn
-COPY pom.xml ./
-COPY businessdomain/pom.xml businessdomain/
-COPY businessdomain/appgw/pom.xml businessdomain/appgw/
-
-# Download dependencies (cached layer)
-RUN ./mvnw dependency:go-offline -pl businessdomain/appgw
-
-# Copy source code
-COPY businessdomain/shared/ businessdomain/shared/
-COPY businessdomain/appgw/src businessdomain/appgw/src
+# Copy all files needed for build
+COPY . .
 
 # Build the application
 RUN ./mvnw clean package -pl businessdomain/appgw -DskipTests

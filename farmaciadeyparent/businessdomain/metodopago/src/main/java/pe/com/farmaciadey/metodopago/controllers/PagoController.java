@@ -140,7 +140,7 @@ public class PagoController {
         try {
             log.info("📄 Generando boleta PDF para transacción: {}", transaccionId);
 
-            byte[] pdfBytes = pdfBoletaService.generarBoletaPdf(transaccionId);
+            byte[] pdfBytes = pdfBoletaService.generarBoletaPorTransaccion(transaccionId);
 
             ByteArrayResource resource = new ByteArrayResource(pdfBytes);
 

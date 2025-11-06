@@ -9,6 +9,7 @@ import pe.com.farmaciadey.auth.models.UserInfo;
 import pe.com.farmaciadey.auth.repository.UserRepository;
 
 @Component
+// @Profile("!render")  // Comentado para que se ejecute siempre
 public class DataInitializer implements CommandLineRunner {
 
     @Autowired
@@ -56,6 +57,24 @@ public class DataInitializer implements CommandLineRunner {
             
             userRepository.save(adminUser);
             System.out.println("✅ Usuario admin creado: admin/admin123");
+        }
+
+        // Crear usuario phuerta si no existe
+        if (userRepository.findByUsername("phuerta") == null) {
+            UserInfo phurtaUser = new UserInfo();
+            phurtaUser.setIdentificacion("12345678");
+            phurtaUser.setNombres("Pablo");
+            phurtaUser.setApellidos("Huerta");
+            phurtaUser.setTelefono("987654321");
+            phurtaUser.setEmail("phuerta@farmacia.com");
+            phurtaUser.setDireccion("Lima, Perú");
+            phurtaUser.setRol("administrador");
+            phurtaUser.setUsername("phuerta");
+            phurtaUser.setPassword(passwordEncoder.encode("phuerta"));
+            phurtaUser.setEliminado(0);
+            
+            userRepository.save(phurtaUser);
+            System.out.println("✅ Usuario phuerta creado: phuerta/phuerta");
         }
     }
 }
