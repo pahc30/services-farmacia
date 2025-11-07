@@ -158,3 +158,5 @@ networks:
 # Volumes
 volumes:
   postgres_data:
+    external: true
+    name: farmacia_postgres_data_permanent

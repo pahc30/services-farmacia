@@ -15,23 +15,57 @@ cd services-farmacia/farmaciadeyparent
 git checkout feature/render-deployment
 ```
 
-### 2. Build All Services
+### 2. Create External Volume (First Time Only)
+```bash
+# This ensures data persists across container restarts
+docker volume create farmacia_postgres_data_permanent
+```
+
+### 3. Build All Services
 ```bash
 ./build-docker.sh
 ```
 
-### 3. Start Full Stack
+### 4. Start Full Stack
 ```bash
 docker-compose up -d
 ```
 
-### 4. Verify Services
+### 5. Verify Services
 ```bash
 # Check all services are running
 docker-compose ps
 
 # Check specific service logs
 docker-compose logs -f farmacia-gateway
+```
+
+## 💾 Data Persistence
+
+**IMPORTANTE**: Los datos de PostgreSQL ahora persisten automáticamente gracias al volumen externo `farmacia_postgres_data_permanent`.
+
+### ✅ Comandos Seguros (NO borran datos):
+```bash
+# Parar servicios (mantiene datos)
+docker-compose stop
+
+# Reiniciar servicios (mantiene datos)
+docker-compose restart
+
+# Recrear contenedores (mantiene datos)
+docker-compose up -d --force-recreate
+
+# Redesplegar tras cambios de código (mantiene datos)
+./build-docker.sh && docker-compose up -d
+```
+
+### ⚠️ Solo si quieres BORRAR todos los datos:
+```bash
+# Eliminar volumen permanente (BORRA TODOS LOS DATOS)
+docker volume rm farmacia_postgres_data_permanent
+
+# Recrear volumen limpio
+docker volume create farmacia_postgres_data_permanent
 ```
 
 ## 🌐 Service URLs (Local Docker)
