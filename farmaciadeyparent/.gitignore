@@ -40,3 +40,14 @@ logs/*.pid
 *.swp
 *.swo
 *~
+
+# Test PDFs and temporary files
+test-*.pdf
+test_*.pdf
+*.pdf.tmp
+
+# Fix scripts (obsoletos)
+fix_*.sh
+
+# Docker volumes data
+postgres-data/

@@ -73,6 +73,10 @@ public class UsuarioService {
         return repository.find(id);
     }
 
+    public Usuario findByUsername(String username){
+        return repository.findByUsername(username);
+    }
+
     public Usuario saveWithAuth(Usuario usuario) throws Exception {
         // Primero guardamos el usuario en el servicio de usuarios
         Usuario usuarioCreado = save(usuario);

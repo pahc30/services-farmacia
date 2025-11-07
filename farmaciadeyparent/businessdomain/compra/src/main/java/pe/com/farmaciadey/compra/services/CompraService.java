@@ -18,13 +18,19 @@ public class CompraService {
 
     public Compra save(Compra o){
         o.setFecha(new Date());
-        o.setTotal(o.getSubtotal() + (o.getSubtotal() * o.getIgv()));
+        // Los precios ya incluyen IGV, por lo que el total es igual al subtotal
+        o.setTotal(o.getSubtotal());
         return repository.save(o);
     }
 
     @Transactional(readOnly = true)
     public List<Compra> listByUsuario(Integer usuarioId){
         return repository.list(usuarioId);
+    }
+
+    @Transactional(readOnly = true)
+    public Compra findById(Integer compraId){
+        return repository.findById(compraId).orElse(null);
     }
     
     /**

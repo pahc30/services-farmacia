@@ -120,4 +120,25 @@ public class UsuarioController {
         }
     }
 
+    @PostMapping(value = "/findByUsername/{username}")
+    public ResponseEntity<Object> findByUsername(@PathVariable("username") String username) throws Exception {
+        DataResponse response = new DataResponse();
+        try {
+            Usuario usuario = service.findByUsername(username);
+            if (usuario != null) {
+                response.setDato(usuario);
+                response.setEstado(1);
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                response.setMensaje("Usuario no encontrado");
+                response.setEstado(0);
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            response.setException(e.getMessage());
+            response.setEstado(0);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

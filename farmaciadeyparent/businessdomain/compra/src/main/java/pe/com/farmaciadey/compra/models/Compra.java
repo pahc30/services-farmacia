@@ -29,7 +29,7 @@ public class Compra {
     private Date fecha;
     private Integer usuarioId;
     private Integer metodoPagoId;
-    private Double igv = 0.18;
+    private Double igv = 0.0; // IGV ya incluido en precios, no se suma adicionalmente
     private Double subtotal;
     private Double total;
     private Integer eliminado = 0;
@@ -40,4 +40,9 @@ public class Compra {
 
     @Transient
     private String metodoPago;
+    
+    // Método para actualizar IGV dinámicamente (no persiste en BD)
+    public void setIgv(Double igv) {
+        this.igv = igv;
+    }
 }

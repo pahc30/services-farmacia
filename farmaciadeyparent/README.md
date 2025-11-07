@@ -1,165 +1,135 @@
-# 🏥 FARMACIA DEY PARENT - SISTEMA COMPLETO
+# 🏥 FARMACIA DEY - SISTEMA COMPLETO
 
-## 📱 PROYECTOS DISPONIBLES
+## 📋 DESCRIPCIÓN
+Sistema de farmacia completo con microservicios backend, frontend Angular y aplicación Android. Incluye gestión de productos, usuarios, compras, métodos de pago y generación de boletas PDF.
 
-### 1. **BACKEND MICROSERVICIOS** ✅ FUNCIONANDO
-Arquitectura de 6 microservicios con Spring Boot:
+## 🚀 INICIO RÁPIDO
 
-| Servicio | Puerto | Estado | URL | Descripción |
-|----------|--------|--------|-----|-------------|
-| **Gateway** | 9000 | ✅ | http://localhost:9000 | API Gateway principal |
-| **Auth** | 7011 | ✅ | http://localhost:7011/auth | Autenticación y JWT |
-| **Usuario** | 7012 | ✅ | http://localhost:7012/usuario | Gestión de usuarios |
-| **Producto** | 7013 | ✅ | http://localhost:7013/producto | Catálogo de productos |
-| **MetodoPago** | 7014 | ✅ | http://localhost:7014/metodopago | Métodos de pago |
-| **Compra** | 7015 | ✅ | http://localhost:7015/compra | Gestión de compras |
+### Prerequisitos
+- Docker & Docker Compose
+- Java 21+ (para desarrollo)
+- Node.js 18+ (para frontend)
 
-### 2. **APLICACIÓN ANDROID** ✅ COMPLETADA
-Proyecto Android completo en: `farmacia-android/`
-
-- **Arquitectura**: MVVM con StateFlow
-- **Lenguaje**: Kotlin 1.9.22
-- **SDK**: Android 34
-- **Características**:
-  - Login con JWT
-  - Lista de productos con grid
-  - Navegación entre pantallas
-  - API Client integrado
-  - Material Design 3
-
-## 🔐 CREDENCIALES DE PRUEBA
-
-### Backend (Base de Datos H2)
-```
-Usuario: test1
-Contraseña: test1
-
-Usuario Admin: admin
-Contraseña: admin123
-```
-
-### Android (Para testing)
-```
-Usuario: test1
-Contraseña: test1
-```
-
-## 🚀 COMANDOS DISPONIBLES
-
-### Iniciar Todos los Servicios
+### Ejecutar el Sistema
 ```bash
+# 1. Clonar repositorio
+git clone <repo-url>
+cd farmaciadeyparent
+
+# 2. Iniciar todos los servicios
 ./start-all-services.sh
+
+# 3. Acceder a la aplicación
+# Frontend: http://localhost:4200
+# Gateway API: http://localhost:9000
+# Usuario de prueba: test.user / 123456
 ```
 
-### Detener Todos los Servicios
-```bash
-./stop-all-services.sh
-```
+## 🏗️ ARQUITECTURA
 
-### Iniciar Servicios Manualmente
-```bash
-# Gateway
-./mvnw spring-boot:run -pl businessdomain/appgw &
+### Microservicios Backend
+| Servicio | Puerto | Descripción |
+|----------|--------|-------------|
+| **Gateway** | 9000 | API Gateway y enrutamiento |
+| **Auth** | 7011 | Autenticación JWT |
+| **Usuario** | 7012 | Gestión de usuarios |
+| **Producto** | 7013 | Catálogo de productos |
+| **Metodopago** | 7014 | Pagos y boletas PDF |
+| **Compra** | 7015 | Gestión de compras |
 
-# Auth
-./mvnw spring-boot:run -pl businessdomain/auth &
+### Características Principales
+- ✅ **Autenticación JWT** - Login seguro
+- ✅ **Gestión de Productos** - CRUD completo con imágenes
+- ✅ **Carrito de Compras** - Funcionalidad completa
+- ✅ **Métodos de Pago** - Yape/Plin simulado
+- ✅ **Boletas PDF** - Generación automática con IGV correcto
+- ✅ **Base de datos persistente** - PostgreSQL con volúmenes Docker
 
-# Usuario
-./mvnw spring-boot:run -pl businessdomain/usuario &
+## 🔧 DESARROLLO
 
-# Producto
-./mvnw spring-boot:run -pl businessdomain/producto &
-
-# MetodoPago
-./mvnw spring-boot:run -pl businessdomain/metodopago &
-
-# Compra
-./mvnw spring-boot:run -pl businessdomain/compra &
-```
-
-## 🔧 API ENDPOINTS PRINCIPALES
-
-### A través del Gateway (Puerto 9000)
-```
-POST http://localhost:9000/auth/login
-GET  http://localhost:9000/usuario/
-GET  http://localhost:9000/producto/
-GET  http://localhost:9000/metodopago/
-GET  http://localhost:9000/compra/
-```
-
-### Directos (Para debug)
-```
-POST http://localhost:7011/auth/login
-GET  http://localhost:7012/usuario/actuator/health
-GET  http://localhost:7013/producto/actuator/health
-GET  http://localhost:7014/metodopago/actuator/health
-GET  http://localhost:7015/compra/actuator/health
-```
-
-## 📂 ESTRUCTURA DEL PROYECTO
-
+### Estructura del Proyecto
 ```
 farmaciadeyparent/
-├── businessdomain/           # Microservicios Backend
-│   ├── appgw/               # API Gateway
-│   ├── auth/                # Autenticación
-│   ├── usuario/             # Gestión usuarios
-│   ├── producto/            # Catálogo productos
-│   ├── metodopago/          # Métodos de pago
-│   └── compra/              # Gestión compras
-│
-├── farmacia-android/        # Aplicación Android
-│   ├── app/src/main/java/   # Código Kotlin
-│   ├── app/src/main/res/    # Recursos Android
-│   └── build.gradle.kts     # Configuración Gradle
-│
-├── start-all-services.sh    # Script inicio servicios
-├── stop-all-services.sh     # Script parada servicios
-└── logs/                    # Logs de servicios
+├── businessdomain/          # Microservicios Spring Boot
+│   ├── appgw/              # API Gateway
+│   ├── auth/               # Servicio de autenticación
+│   ├── usuario/            # Gestión de usuarios
+│   ├── producto/           # Catálogo de productos
+│   ├── metodopago/         # Pagos y boletas PDF
+│   └── compra/             # Gestión de compras
+├── docs/                   # Documentación técnica
+├── logs/                   # Logs de servicios (en desarrollo)
+├── docker-compose.yml      # Configuración Docker
+├── start-all-services.sh   # Script de inicio
+└── stop-all-services.sh    # Script de parada
 ```
+
+### Scripts Útiles
+```bash
+# Iniciar todos los servicios
+./start-all-services.sh
+
+# Detener todos los servicios
+./stop-all-services.sh
+
+# Reconstruir servicios específicos
+docker-compose build <servicio> --no-cache
+docker-compose restart <servicio>
+```
+
+### Base de Datos
+- **PostgreSQL 15** en puerto 5432
+- **Volumen persistente**: `farmacia_postgres_data_permanent`
+- **Usuario**: farmacia / farmacia123
+
+## 📱 APLICACIONES
+
+### Frontend Angular (Puerto 4200)
+- Catálogo de productos con búsqueda
+- Carrito de compras
+- Historial de compras ("Mis Compras")
+- Descarga de boletas PDF
+
+### Aplicación Android
+- Código en: `farmacia-android/`
+- Arquitectura MVVM con Kotlin
+- Integración completa con backend
 
 ## 🧪 TESTING
+Las carpetas `test/` contienen:
+- **Pruebas Unitarias** (`*Test.java`)
+- **Pruebas de Integración** (`*IT.java`) 
+- **Pruebas de Caja Negra** (`*BlackBoxTest.java`)
 
-### Backend
 ```bash
-# Verificar todos los servicios
-curl http://localhost:9000/actuator/health
-
-# Test de login
-curl -X POST http://localhost:9000/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"test1","password":"test1"}'
+# Ejecutar tests
+./mvnw test -pl businessdomain/<servicio>
 ```
 
-### Android
-1. Abrir proyecto en Android Studio
-2. Ejecutar en emulador o dispositivo
-3. Login con credenciales: test1/test1
-4. Navegar por la app
+## 📄 FUNCIONALIDADES DESTACADAS
 
-## 💾 BASE DE DATOS
+### Sistema de IGV Corregido
+- Precios de productos **incluyen IGV** (18%)
+- Boletas PDF muestran desglose correcto:
+  - Subtotal: Precio sin IGV
+  - IGV: Monto del impuesto
+  - Total: Precio final del producto
 
-Cada servicio usa H2 in-memory:
-- **Consola H2**: http://localhost:[PORT]/h2-console
-- **Usuario**: sa
-- **Contraseña**: (vacía)
+### Boletas PDF Profesionales
+- Generación automática tras cada compra
+- Datos reales del usuario
+- Timezone UTC-5 (Lima)
+- Formato profesional con logo y datos de empresa
 
-## 🔄 ESTADO ACTUAL
+## 🔐 USUARIOS DE PRUEBA
+| Usuario | Contraseña | Rol |
+|---------|------------|-----|
+| test.user | 123456 | Cliente |
+| admin | admin123 | Administrador |
 
-✅ **COMPLETADO**: 
-- 6 microservicios funcionando
-- Android app completamente funcional
-- Autenticación JWT implementada
-- API Gateway configurado
-- Scripts de gestión creados
-
-🎯 **LISTO PARA**:
-- Testing end-to-end
-- Desarrollo de nuevas features
-- Integración con frontend web
-- Deploy en producción
+## 📞 SOPORTE
+Para más información, consultar la documentación en `docs/`
 
 ---
-**Última actualización**: 29 Oct 2025, 14:05 PM
-**Servicios activos**: 6/6 ✅
+**Desarrollado por**: UTP - Integrador II  
+**Fecha**: Noviembre 2025

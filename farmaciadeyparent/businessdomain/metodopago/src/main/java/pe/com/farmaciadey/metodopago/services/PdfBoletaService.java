@@ -6,6 +6,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import pe.com.farmaciadey.metodopago.models.TransaccionPago;
@@ -19,6 +20,8 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,6 +48,7 @@ public class PdfBoletaService {
 
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,##0.00");
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+    private static final ZoneId PERU_TIMEZONE = ZoneId.of("America/Lima"); // UTC-5
 
     /**
      * Genera una boleta PDF para una transacción específica
@@ -65,7 +69,7 @@ public class PdfBoletaService {
         }
 
         // Obtener información de la compra relacionada
-        JsonNode compraInfo = obtenerInformacionCompra(transaccion.getCompraId());
+        JsonNode compraInfo = obtenerInformacionCompra(transaccion.getCompraId().intValue());
         
         return generarPdfInterno(transaccion, compraInfo);
     }
@@ -73,9 +77,10 @@ public class PdfBoletaService {
     /**
      * Genera una boleta PDF por ID de compra
      */
-    public byte[] generarBoletaPorCompra(Long compraId) throws Exception {
-        // Obtener información de la compra desde el microservicio de compras
-        JsonNode compraInfo = obtenerInformacionCompra(compraId);
+    public byte[] generarBoletaPorCompra(Long compraId) throws DocumentException, Exception {
+        // Buscar la transacción asociada a esta compra
+        // En un caso real, podrías tener múltiples transacciones por compra, pero aquí asumimos una
+        JsonNode compraInfo = obtenerInformacionCompra(compraId.intValue());
         
         // Primero intentar encontrar una transacción completada
         Optional<TransaccionPago> transaccionOpt = transaccionRepository
@@ -99,11 +104,11 @@ public class PdfBoletaService {
     /**
      * Obtiene información detallada de la compra desde el microservicio de compras
      */
-    private JsonNode obtenerInformacionCompra(Long compraId) {
+    private JsonNode obtenerInformacionCompra(Integer compraId) {
         try {
             log.info("🔄 Obteniendo información de compra: {}", compraId);
             
-            String response = webClient.post()
+            String response = webClient.get()
                 .uri("http://farmacia-compra:7015/compra/api/compra/find/" + compraId)
                 .retrieve()
                 .bodyToMono(String.class)
@@ -134,6 +139,8 @@ public class PdfBoletaService {
             
             String response = webClient.post()
                 .uri("http://farmacia-usuario:7012/usuario/api/usuarios/find/" + usuarioId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{}") 
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
@@ -273,13 +280,31 @@ public class PdfBoletaService {
         String nombreCliente = "Cliente General";
         String metodoPago = "Efectivo";
         
+        log.info("🔍 Información de compra recibida: {}", compraInfo != null ? compraInfo.toString() : "null");
+        
         if (compraInfo != null && compraInfo.has("usuarioId")) {
             try {
                 Long usuarioId = compraInfo.get("usuarioId").asLong();
+                log.info("🔍 Obteniendo información del usuario ID: {}", usuarioId);
                 JsonNode usuarioInfo = obtenerInformacionUsuario(usuarioId);
                 
-                if (usuarioInfo != null && usuarioInfo.has("nombre") && usuarioInfo.has("apellido")) {
-                    nombreCliente = usuarioInfo.get("nombre").asText() + " " + usuarioInfo.get("apellido").asText();
+                log.info("🔍 Información de usuario recibida: {}", usuarioInfo != null ? usuarioInfo.toString() : "null");
+                
+                if (usuarioInfo != null) {
+                    String nombres = usuarioInfo.has("nombres") ? usuarioInfo.get("nombres").asText() : "";
+                    String apellidos = usuarioInfo.has("apellidos") ? usuarioInfo.get("apellidos").asText() : "";
+                    
+                    log.info("🔍 Datos extraídos - Nombres: '{}', Apellidos: '{}'", nombres, apellidos);
+                    
+                    if (!nombres.isEmpty() && !apellidos.isEmpty()) {
+                        nombreCliente = nombres + " " + apellidos;
+                    } else if (!nombres.isEmpty()) {
+                        nombreCliente = nombres;
+                    } else if (!apellidos.isEmpty()) {
+                        nombreCliente = apellidos;
+                    }
+                    
+                    log.info("✅ Cliente final: '{}'", nombreCliente);
                 }
             } catch (Exception e) {
                 log.warn("No se pudo obtener información del usuario: {}", e.getMessage());
@@ -299,7 +324,9 @@ public class PdfBoletaService {
         }
         
         infoTable.addCell(new PdfPCell(new Phrase("Fecha:", normalFont)));
-        infoTable.addCell(new PdfPCell(new Phrase(transaccion.getFechaCreacion().format(DATE_FORMATTER), normalFont)));
+        // Convertir fecha a zona horaria de Perú (UTC-5)
+        LocalDateTime fechaPeru = transaccion.getFechaCreacion().atZone(ZoneId.systemDefault()).withZoneSameInstant(PERU_TIMEZONE).toLocalDateTime();
+        infoTable.addCell(new PdfPCell(new Phrase(fechaPeru.format(DATE_FORMATTER), normalFont)));
         infoTable.addCell(new PdfPCell(new Phrase("Cliente:", normalFont)));
         infoTable.addCell(new PdfPCell(new Phrase(nombreCliente, normalFont)));
         
@@ -312,6 +339,13 @@ public class PdfBoletaService {
     }
 
     private void agregarTablaProductos(Document document, TransaccionPago transaccion, JsonNode compraInfo, Font headerFont, Font normalFont) throws DocumentException {
+        log.info("🔍 Iniciando agregarTablaProductos");
+        log.info("🔍 compraInfo disponible: {}", compraInfo != null ? "Sí" : "No");
+        
+        if (compraInfo != null) {
+            log.info("🔍 Estructura completa de compraInfo: {}", compraInfo.toString());
+        }
+        
         PdfPTable productTable = new PdfPTable(5);
         productTable.setWidthPercentage(100);
         productTable.setWidths(new float[]{3, 1, 2, 2, 2});
@@ -324,25 +358,44 @@ public class PdfBoletaService {
         productTable.addCell(new PdfPCell(new Phrase("Importe", headerFont)));
         
         // Obtener productos reales de la compra
-        if (compraInfo != null && compraInfo.has("detalles") && compraInfo.get("detalles").isArray()) {
-            for (JsonNode detalle : compraInfo.get("detalles")) {
+        if (compraInfo != null && compraInfo.has("detalleCompra") && compraInfo.get("detalleCompra").isArray()) {
+            for (JsonNode detalle : compraInfo.get("detalleCompra")) {
                 String descripcion = "Producto";
                 String cantidad = "1";
                 String precioUnitario = "0.00";
                 String descuento = "0.00";
                 String importe = "0.00";
                 
+                // Obtener nombre del producto
                 if (detalle.has("producto") && detalle.get("producto").has("nombre")) {
                     descripcion = detalle.get("producto").get("nombre").asText();
                 }
+                
+                // Obtener cantidad
                 if (detalle.has("cantidad")) {
-                    cantidad = detalle.get("cantidad").asText();
+                    cantidad = String.valueOf(detalle.get("cantidad").asInt());
                 }
-                if (detalle.has("precioUnitario")) {
+                
+                // Obtener precio unitario real del producto
+                if (detalle.has("producto") && detalle.get("producto").has("precio")) {
+                    precioUnitario = DECIMAL_FORMAT.format(detalle.get("producto").get("precio").asDouble());
+                } else if (detalle.has("precioUnitario")) {
                     precioUnitario = DECIMAL_FORMAT.format(detalle.get("precioUnitario").asDouble());
                 }
+                
+                // Calcular importe (cantidad * precio unitario)
                 if (detalle.has("subtotal")) {
                     importe = DECIMAL_FORMAT.format(detalle.get("subtotal").asDouble());
+                } else {
+                    // Calcular si no está disponible el subtotal
+                    int cant = detalle.has("cantidad") ? detalle.get("cantidad").asInt() : 1;
+                    double precio = 0.0;
+                    if (detalle.has("producto") && detalle.get("producto").has("precio")) {
+                        precio = detalle.get("producto").get("precio").asDouble();
+                    } else if (detalle.has("precioUnitario")) {
+                        precio = detalle.get("precioUnitario").asDouble();
+                    }
+                    importe = DECIMAL_FORMAT.format(cant * precio);
                 }
                 
                 productTable.addCell(new PdfPCell(new Phrase(descripcion, normalFont)));
@@ -352,8 +405,11 @@ public class PdfBoletaService {
                 productTable.addCell(new PdfPCell(new Phrase(importe, normalFont)));
             }
         } else {
-            // Fallback si no hay información de productos
-            productTable.addCell(new PdfPCell(new Phrase(transaccion.getDescripcion() != null ? transaccion.getDescripcion() : "Compra en Farmacia DeY", normalFont)));
+            // Fallback si no hay información de productos - usar descripción más específica
+            String descripcionCompra = transaccion.getDescripcion() != null && !transaccion.getDescripcion().isEmpty() 
+                ? transaccion.getDescripcion() 
+                : "Compra en Farmacia DeY - Boleta generada sin transacción de pago";
+            productTable.addCell(new PdfPCell(new Phrase(descripcionCompra, normalFont)));
             productTable.addCell(new PdfPCell(new Phrase("1", normalFont)));
             productTable.addCell(new PdfPCell(new Phrase(DECIMAL_FORMAT.format(transaccion.getMonto()), normalFont)));
             productTable.addCell(new PdfPCell(new Phrase("0.00", normalFont)));
@@ -368,14 +424,17 @@ public class PdfBoletaService {
         totalsTable.setWidthPercentage(60);
         totalsTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
         
-        // Obtener el total real de la compra si está disponible
-        BigDecimal montoTotal = transaccion.getMonto();
-        if (compraInfo != null && compraInfo.has("total") && !compraInfo.get("total").isNull()) {
-            montoTotal = new BigDecimal(compraInfo.get("total").asText());
+        // Los precios ya incluyen IGV, usar el subtotal de la compra como monto real
+        BigDecimal montoRealConIgv = transaccion.getMonto();
+        
+        // Si hay información de compra, usar el subtotal (que es el precio real con IGV)
+        if (compraInfo != null && compraInfo.has("subtotal") && !compraInfo.get("subtotal").isNull()) {
+            montoRealConIgv = new BigDecimal(compraInfo.get("subtotal").asText());
         }
         
-        BigDecimal subtotal = montoTotal.divide(new BigDecimal("1.18"), 2, java.math.RoundingMode.HALF_UP); // IGV 18%
-        BigDecimal igv = montoTotal.subtract(subtotal);
+        // Calcular desglose: subtotal sin IGV e IGV por separado
+        BigDecimal subtotal = montoRealConIgv.divide(new BigDecimal("1.18"), 2, java.math.RoundingMode.HALF_UP); // Precio base sin IGV
+        BigDecimal igv = montoRealConIgv.subtract(subtotal); // Monto del IGV
         
         totalsTable.addCell(new PdfPCell(new Phrase("Sub Total:", normalFont)));
         totalsTable.addCell(new PdfPCell(new Phrase("S/ " + DECIMAL_FORMAT.format(subtotal), normalFont)));
@@ -390,7 +449,7 @@ public class PdfBoletaService {
         totalLabelCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
         totalsTable.addCell(totalLabelCell);
         
-        PdfPCell totalValueCell = new PdfPCell(new Phrase("S/ " + DECIMAL_FORMAT.format(montoTotal), headerFont));
+        PdfPCell totalValueCell = new PdfPCell(new Phrase("S/ " + DECIMAL_FORMAT.format(montoRealConIgv), headerFont));
         totalValueCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
         totalsTable.addCell(totalValueCell);
         
