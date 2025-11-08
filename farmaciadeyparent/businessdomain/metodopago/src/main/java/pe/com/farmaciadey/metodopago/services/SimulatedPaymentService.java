@@ -10,6 +10,7 @@ import pe.com.farmaciadey.metodopago.repository.TransaccionPagoRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 /**
@@ -29,6 +30,7 @@ public class SimulatedPaymentService {
     public PaymentIntentResponse createPaymentIntent(PaymentIntentRequest request) {
         log.info("🎭 Creando pago SIMULADO para compra: {}, monto: {}", 
                 request.getCompraId(), request.getMonto());
+        log.info("📝 Descripción recibida del frontend: '{}'", request.getDescripcion());
         
         try {
             // Crear transacción en la base de datos
@@ -38,9 +40,18 @@ public class SimulatedPaymentService {
             transaccion.setMonto(BigDecimal.valueOf(request.getMonto()));
             transaccion.setMoneda("PEN");
             transaccion.setEstado(TransaccionPago.EstadoTransaccion.PENDIENTE);
-            transaccion.setFechaCreacion(LocalDateTime.now());
-            transaccion.setFechaActualizacion(LocalDateTime.now());
-            transaccion.setDescripcion("Pago simulado - " + request.getDescripcion());
+            // Usar zona horaria UTC-5 (Lima/Perú)
+            LocalDateTime nowLima = LocalDateTime.now(ZoneId.of("America/Lima"));
+            transaccion.setFechaCreacion(nowLima);
+            transaccion.setFechaActualizacion(nowLima);
+            
+            // Limpiar descripción si viene con "Pago simulado -" del frontend
+            String descripcionLimpia = request.getDescripcion();
+            if (descripcionLimpia != null && descripcionLimpia.startsWith("Pago simulado - ")) {
+                descripcionLimpia = descripcionLimpia.substring("Pago simulado - ".length());
+                log.info("🧹 Descripción limpiada: '{}' -> '{}'", request.getDescripcion(), descripcionLimpia);
+            }
+            transaccion.setDescripcion(descripcionLimpia);
             transaccion.setEliminado(0);
             
             // Generar referencias simuladas
@@ -87,26 +98,7 @@ public class SimulatedPaymentService {
             
             TransaccionPago transaccion = transaccionOpt.get();
             
-            // Simular confirmación (90% de éxito)
-            boolean confirmed = random.nextDouble() > 0.1;
-            
-            if (confirmed) {
-                transaccion.setEstado(TransaccionPago.EstadoTransaccion.COMPLETADA);
-                transaccion.setFechaPago(LocalDateTime.now());
-                transaccion.setFechaActualizacion(LocalDateTime.now());
-                transaccionRepository.save(transaccion);
-                
-                log.info("✅ Pago confirmado exitosamente: ID={}", transaccion.getId());
-                return true;
-            } else {
-                transaccion.setEstado(TransaccionPago.EstadoTransaccion.FALLIDA);
-                transaccion.setMensajeError("Simulación de fallo en confirmación");
-                transaccion.setFechaActualizacion(LocalDateTime.now());
-                transaccionRepository.save(transaccion);
-                
-                log.warn("❌ Confirmación simulada fallida: ID={}", transaccion.getId());
-                return false;
-            }
+            return procesarConfirmacionPago(transaccion);
             
         } catch (Exception e) {
             log.error("❌ Error confirmando pago: {}", e.getMessage(), e);
@@ -129,29 +121,61 @@ public class SimulatedPaymentService {
             
             TransaccionPago transaccion = transaccionOpt.get();
             
-            // Simular confirmación (90% de éxito)
-            boolean confirmed = random.nextDouble() > 0.1;
-            
-            if (confirmed) {
-                transaccion.setEstado(TransaccionPago.EstadoTransaccion.COMPLETADA);
-                transaccion.setFechaPago(LocalDateTime.now());
-                transaccion.setFechaActualizacion(LocalDateTime.now());
-                transaccionRepository.save(transaccion);
-                
-                log.info("✅ Pago confirmado exitosamente: ID={}", transaccion.getId());
-                return true;
-            } else {
-                transaccion.setEstado(TransaccionPago.EstadoTransaccion.FALLIDA);
-                transaccion.setMensajeError("Simulación de fallo en confirmación");
-                transaccion.setFechaActualizacion(LocalDateTime.now());
-                transaccionRepository.save(transaccion);
-                
-                log.warn("❌ Confirmación simulada fallida: ID={}", transaccion.getId());
-                return false;
-            }
+            return procesarConfirmacionPago(transaccion);
             
         } catch (Exception e) {
             log.error("❌ Error confirmando pago: {}", e.getMessage(), e);
+            return false;
+        }
+    }
+    
+    /**
+     * Método común para procesar la confirmación de pagos con nueva lógica de negocio
+     */
+    private boolean procesarConfirmacionPago(TransaccionPago transaccion) {
+        LocalDateTime nowLima = LocalDateTime.now(ZoneId.of("America/Lima"));
+        
+        // 1. Verificar timeout (1 minuto desde creación)
+        LocalDateTime timeoutLimit = transaccion.getFechaCreacion().plusMinutes(1);
+        if (nowLima.isAfter(timeoutLimit)) {
+            transaccion.setEstado(TransaccionPago.EstadoTransaccion.FALLIDA);
+            transaccion.setMensajeError("Tiempo de pago expirado (más de 1 minuto)");
+            transaccion.setFechaActualizacion(nowLima);
+            transaccionRepository.save(transaccion);
+            
+            log.warn("⏰ Pago expirado por timeout: ID={}", transaccion.getId());
+            return false;
+        }
+        
+        // 2. Simular validación de saldo (85% éxito, 10% saldo insuficiente, 5% error técnico)
+        double randomValue = random.nextDouble();
+        
+        if (randomValue < 0.85) {
+            // Pago exitoso
+            transaccion.setEstado(TransaccionPago.EstadoTransaccion.COMPLETADA);
+            transaccion.setFechaPago(nowLima);
+            transaccion.setFechaActualizacion(nowLima);
+            transaccionRepository.save(transaccion);
+            
+            log.info("✅ Pago confirmado exitosamente: ID={}", transaccion.getId());
+            return true;
+        } else if (randomValue < 0.95) {
+            // Saldo insuficiente
+            transaccion.setEstado(TransaccionPago.EstadoTransaccion.FALLIDA);
+            transaccion.setMensajeError("Saldo insuficiente en la cuenta");
+            transaccion.setFechaActualizacion(nowLima);
+            transaccionRepository.save(transaccion);
+            
+            log.warn("💳 Pago rechazado por saldo insuficiente: ID={}", transaccion.getId());
+            return false;
+        } else {
+            // Error técnico
+            transaccion.setEstado(TransaccionPago.EstadoTransaccion.FALLIDA);
+            transaccion.setMensajeError("Error técnico del proveedor de pagos");
+            transaccion.setFechaActualizacion(nowLima);
+            transaccionRepository.save(transaccion);
+            
+            log.warn("❌ Error técnico simulado: ID={}", transaccion.getId());
             return false;
         }
     }

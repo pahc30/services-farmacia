@@ -9,6 +9,8 @@ services:
       POSTGRES_DB: farmaciadb
       POSTGRES_USER: farmacia
       POSTGRES_PASSWORD: farmacia123
+      TZ: America/Lima
+      PGTZ: America/Lima
     ports:
       - "5432:5432"
     volumes:
@@ -79,6 +81,8 @@ services:
       - CORS_ORIGINS=http://localhost:4200
     ports:
       - "7013:7013"
+    volumes:
+      - postgres_data:/data
     depends_on:
       farmacia-db:
         condition: service_healthy
@@ -99,6 +103,7 @@ services:
       - JWT_SECRET=miSecretoSuperSecreto123456789012345678901234567890
       - CORS_ORIGINS=http://localhost:4200
       - STRIPE_API_KEY=sk_test_default
+      - TZ=America/Lima
       - PAYPAL_CLIENT_ID=client_id_default
       - PAYPAL_CLIENT_SECRET=client_secret_default
     ports:

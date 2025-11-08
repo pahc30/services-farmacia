@@ -232,6 +232,9 @@ public class ProductoController {
                     case "webp":
                         contentType = "image/webp";
                         break;
+                    case "svg":
+                        contentType = "image/svg+xml";
+                        break;
                 }
                 
                 return ResponseEntity.status(HttpStatus.OK)
