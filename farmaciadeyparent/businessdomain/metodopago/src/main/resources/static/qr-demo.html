@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo QR Scan Detection - Farmacia Dey</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .qr-container {
+            text-align: center;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            border: 2px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            font-size: 12px;
+            color: #666;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.pending { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .status.scanned { background: #d1f2eb; color: #00695c; border: 1px solid #a7ffeb; }
+        .status.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        
+        .info-box {
+            background: #e7f3ff;
+            border: 1px solid #b8daff;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .step {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .step-title {
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        
+        .url-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            border-radius: 3px;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+    </style>
+    <!-- Incluir librería para generar QR codes -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>🔲 Demo: Detección de Escaneo QR</h1>
+        <p>Esta demo muestra cómo detectar cuando alguien escanea un QR de pago con su celular.</p>
+        
+        <div class="info-box">
+            <strong>💡 Cómo funciona:</strong><br>
+            1. Se genera un QR único para cada pago<br>
+            2. El QR contiene una URL especial<br>
+            3. Cuando escaneas con tu celular, visitas esa URL<br>
+            4. El sistema detecta la visita y marca el pago como "escaneado"<br>
+            5. El frontend recibe una notificación automática
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🧪 Prueba el Sistema</h2>
+        
+        <div class="step">
+            <div class="step-title">Paso 1: Simular creación de pago</div>
+            <p>Primero necesitamos crear una transacción de pago simulada:</p>
+            <button onclick="crearPagoSimulado()">Crear Pago Simulado</button>
+            <div id="pagoResult"></div>
+        </div>
+
+        <div class="step">
+            <div class="step-title">Paso 2: Generar QR</div>
+            <p>Una vez que tengas una transacción, genera su QR:</p>
+            <button onclick="generarQR()" id="btnGenerarQR" disabled>Generar QR de Pago</button>
+            <div id="qrResult"></div>
+        </div>
+
+        <div class="step">
+            <div class="step-title">Paso 3: Escanear QR</div>
+            <p>Escanea el QR con tu celular o simula el escaneo:</p>
+            <button onclick="simularEscaneo()" id="btnEscanear" disabled>Simular Escaneo</button>
+            <div id="escaneoResult"></div>
+        </div>
+
+        <div class="step">
+            <div class="step-title">Paso 4: Verificar Estado</div>
+            <p>Verifica si el QR ha sido escaneado:</p>
+            <button onclick="verificarEstado()" id="btnVerificar" disabled>Verificar Estado</button>
+            <div id="estadoResult"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📱 QR Generado</h2>
+        <div class="qr-container">
+            <div id="qrStatus" class="status pending">Genera un QR para ver aquí</div>
+            <div id="qrCodeDiv" class="qr-code">QR aparecerá aquí</div>
+            <div id="qrUrlDiv" class="url-box" style="display:none;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📋 Log de Actividad</h2>
+        <div id="log" class="log">Sistema listo. Presiona "Crear Pago Simulado" para empezar...\n</div>
+    </div>
+
+    <script>
+        // Variables globales
+        let transaccionId = null;
+        let qrToken = null;
+        let qrUrl = null;
+        let pollingInterval = null;
+
+        // Configuración de la API
+        const API_BASE = 'http://localhost:7014/metodopago/api/v1';
+
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        async function crearPagoSimulado() {
+            try {
+                log('Creando pago simulado...');
+                
+                const response = await fetch(`${API_BASE}/pagos/crear-intent`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        compraId: Math.floor(Math.random() * 1000) + 1000,
+                        monto: 25.50,
+                        descripcion: 'Pago demo QR scan'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    transaccionId = result.transaccionId;
+                    log(`✅ Pago creado exitosamente. Transacción ID: ${transaccionId}`);
+                    document.getElementById('pagoResult').innerHTML = `
+                        <div class="status scanned">
+                            ✅ Transacción creada: #${transaccionId}<br>
+                            Monto: S/ 25.50
+                        </div>
+                    `;
+                    document.getElementById('btnGenerarQR').disabled = false;
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                log(`❌ Error creando pago: ${error.message}`);
+                document.getElementById('pagoResult').innerHTML = `
+                    <div class="status error">❌ Error: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function generarQR() {
+            if (!transaccionId) {
+                alert('Primero crea un pago simulado');
+                return;
+            }
+
+            try {
+                log(`Generando QR para transacción ${transaccionId}...`);
+                
+                const response = await fetch(`${API_BASE}/qr/generar/${transaccionId}`, {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    qrToken = result.qrToken;
+                    qrUrl = result.qrUrl;
+                    
+                    log(`✅ QR generado exitosamente. Token: ${qrToken}`);
+                    
+                    // Mostrar información del QR
+                    document.getElementById('qrResult').innerHTML = `
+                        <div class="status scanned">
+                            ✅ QR generado exitosamente<br>
+                            Token: ${qrToken}<br>
+                            <strong>Escanea el QR de abajo con tu celular</strong>
+                        </div>
+                    `;
+                    
+                    // Generar el QR visual
+                    await mostrarQR(qrUrl);
+                    
+                    // Habilitar botones
+                    document.getElementById('btnEscanear').disabled = false;
+                    document.getElementById('btnVerificar').disabled = false;
+                    
+                    // Iniciar polling automático
+                    iniciarPolling();
+                    
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                log(`❌ Error generando QR: ${error.message}`);
+                document.getElementById('qrResult').innerHTML = `
+                    <div class="status error">❌ Error: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function mostrarQR(url) {
+            try {
+                // Generar QR code visual
+                const qrCodeDiv = document.getElementById('qrCodeDiv');
+                qrCodeDiv.innerHTML = '';
+                
+                await QRCode.toCanvas(qrCodeDiv, url, {
+                    width: 200,
+                    height: 200,
+                    colorDark: '#000',
+                    colorLight: '#fff'
+                });
+                
+                // Mostrar URL
+                const qrUrlDiv = document.getElementById('qrUrlDiv');
+                qrUrlDiv.style.display = 'block';
+                qrUrlDiv.innerHTML = `<strong>URL del QR:</strong><br>${url}`;
+                
+                // Actualizar estado
+                document.getElementById('qrStatus').innerHTML = '📱 QR listo - Escanea con tu celular';
+                document.getElementById('qrStatus').className = 'status pending';
+                
+                log(`QR visual generado para URL: ${url}`);
+                
+            } catch (error) {
+                log(`❌ Error generando QR visual: ${error.message}`);
+            }
+        }
+
+        function simularEscaneo() {
+            if (!qrUrl) {
+                alert('Primero genera un QR');
+                return;
+            }
+
+            log('Simulando escaneo de QR...');
+            
+            // Abrir la URL del QR en una nueva ventana (simula el escaneo)
+            const ventana = window.open(qrUrl, '_blank', 'width=400,height=600');
+            
+            log('✅ URL del QR abierta. Esto simula el escaneo con tu celular.');
+            
+            // Verificar estado después de un momento
+            setTimeout(() => {
+                verificarEstado();
+            }, 2000);
+        }
+
+        async function verificarEstado() {
+            if (!qrToken) {
+                alert('Primero genera un QR');
+                return;
+            }
+
+            try {
+                log(`Verificando estado del QR ${qrToken}...`);
+                
+                const response = await fetch(`${API_BASE}/qr/estado/${qrToken}`);
+                const result = await response.json();
+                
+                if (result.valido) {
+                    if (result.escaneado) {
+                        log(`✅ ¡QR ESCANEADO! Fecha: ${result.fechaEscaneo}`);
+                        document.getElementById('estadoResult').innerHTML = `
+                            <div class="status scanned">
+                                ✅ ¡QR ESCANEADO EXITOSAMENTE!<br>
+                                Fecha de escaneo: ${new Date(result.fechaEscaneo).toLocaleString()}<br>
+                                <strong>La compra se puede completar automáticamente</strong>
+                            </div>
+                        `;
+                        
+                        // Actualizar estado visual del QR
+                        document.getElementById('qrStatus').innerHTML = '✅ QR Escaneado - Pago detectado';
+                        document.getElementById('qrStatus').className = 'status scanned';
+                        
+                        // Detener polling
+                        if (pollingInterval) {
+                            clearInterval(pollingInterval);
+                            pollingInterval = null;
+                        }
+                        
+                    } else {
+                        log(`⏳ QR aún no escaneado`);
+                        document.getElementById('estadoResult').innerHTML = `
+                            <div class="status pending">
+                                ⏳ QR generado pero aún no escaneado<br>
+                                Esperando escaneo...
+                            </div>
+                        `;
+                    }
+                } else {
+                    log(`❌ QR no válido: ${result.mensaje}`);
+                    document.getElementById('estadoResult').innerHTML = `
+                        <div class="status error">❌ ${result.mensaje}</div>
+                    `;
+                }
+                
+            } catch (error) {
+                log(`❌ Error verificando estado: ${error.message}`);
+                document.getElementById('estadoResult').innerHTML = `
+                    <div class="status error">❌ Error: ${error.message}</div>
+                `;
+            }
+        }
+
+        function iniciarPolling() {
+            // Verificar estado cada 2 segundos automáticamente
+            pollingInterval = setInterval(() => {
+                verificarEstado();
+            }, 2000);
+            
+            log('🔄 Polling automático iniciado (cada 2 segundos)');
+        }
+
+        // Limpiar polling al cerrar la página
+        window.addEventListener('beforeunload', () => {
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+            }
+        });
+    </script>
+</body>
+</html>

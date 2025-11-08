@@ -12,6 +12,7 @@ import pe.com.farmaciadey.metodopago.models.requests.PaymentIntentRequest;
 import pe.com.farmaciadey.metodopago.models.responses.PaymentIntentResponse;
 import pe.com.farmaciadey.metodopago.services.SimulatedPaymentService;
 import pe.com.farmaciadey.metodopago.services.PdfBoletaService;
+import pe.com.farmaciadey.metodopago.services.QRScanDetectionService;
 
 import jakarta.validation.Valid;
 import java.util.HashMap;
@@ -31,6 +32,9 @@ public class PagoController {
 
     @Autowired
     private PdfBoletaService pdfBoletaService;
+
+    @Autowired
+    private QRScanDetectionService qrScanService;
 
     /**
      * Crear un nuevo PaymentIntent usando el sistema simulado
@@ -275,7 +279,13 @@ public class PagoController {
                 "GET /boleta/transaccion/{id} - Descargar boleta por transacción",
                 "GET /boleta/compra/{id} - Descargar boleta por compra",
                 "GET /health - Health check",
-                "GET /info - Esta información"
+                "GET /info - Esta información",
+                "",
+                "=== QR SCAN DETECTION ===",
+                "POST /api/v1/qr/generar/{transaccionId} - Generar QR de pago",
+                "GET /api/v1/qr/scan/{qrToken} - Escanear QR (URL del QR)",
+                "GET /api/v1/qr/estado/{qrToken} - Verificar estado del QR",
+                "POST /api/v1/qr/confirmar-escaneo/{qrToken} - Confirmar escaneo manual"
             });
             
             return ResponseEntity.ok(response);
@@ -285,5 +295,200 @@ public class PagoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", e.getMessage()));
         }
+    }
+
+    // ========== ENDPOINTS QR ==========
+
+    /**
+     * Generar QR de pago para una transacción
+     */
+    @PostMapping("/qr/generar/{transaccionId}")
+    public ResponseEntity<?> generarQRPago(@PathVariable("transaccionId") Long transaccionId) {
+        try {
+            log.info("🔲 Generando QR para transacción: {}", transaccionId);
+            
+            var qrData = qrScanService.generarQRPago(transaccionId);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("qrToken", qrData.getQrToken());
+            response.put("qrUrl", qrData.getQrUrl());
+            response.put("transaccionId", qrData.getTransaccionId());
+            response.put("monto", qrData.getMonto());
+            response.put("descripcion", qrData.getDescripcion());
+            
+            log.info("✅ QR generado exitosamente: {}", qrData.getQrToken());
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("❌ Error generando QR: {}", e.getMessage(), e);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    /**
+     * Endpoint que se llama cuando se escanea el QR (URL dentro del QR)
+     */
+    @GetMapping("/qr/scan/{qrToken}")
+    public ResponseEntity<String> escanearQR(
+            @PathVariable("qrToken") String qrToken,
+            @RequestParam(value = "t", required = false) String timestamp,
+            @RequestParam(value = "amt", required = false) String amount) {
+        
+        try {
+            log.info("📱 QR escaneado: Token={}, Timestamp={}, Amount={}", 
+                    qrToken, timestamp, amount);
+
+            boolean procesado = qrScanService.procesarEscaneoQR(qrToken);
+
+            if (procesado) {
+                String html = generarPaginaConfirmacion(qrToken, amount);
+                return ResponseEntity.ok()
+                        .header("Content-Type", "text/html; charset=UTF-8")
+                        .body(html);
+            } else {
+                String htmlError = generarPaginaError("QR no válido o ya procesado");
+                return ResponseEntity.badRequest()
+                        .header("Content-Type", "text/html; charset=UTF-8")
+                        .body(htmlError);
+            }
+
+        } catch (Exception e) {
+            log.error("❌ Error procesando escaneo QR: {}", e.getMessage(), e);
+            String htmlError = generarPaginaError("Error interno del servidor");
+            return ResponseEntity.status(500)
+                    .header("Content-Type", "text/html; charset=UTF-8")
+                    .body(htmlError);
+        }
+    }
+
+    /**
+     * Verificar si un QR ha sido escaneado (para polling desde frontend)
+     */
+    @GetMapping("/qr/estado/{qrToken}")
+    public ResponseEntity<?> verificarEstadoQR(@PathVariable("qrToken") String qrToken) {
+        try {
+            log.info("🔍 Verificando estado QR: {}", qrToken);
+            
+            // Consultar el estado real del QR desde el servicio
+            boolean escaneado = qrScanService.verificarEscaneoQR(qrToken);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("qrToken", qrToken);
+            response.put("escaneado", escaneado);
+            response.put("fechaEscaneo", escaneado ? System.currentTimeMillis() : null);
+            response.put("transaccionId", 1L);
+            
+            log.info("📊 Estado QR {}: escaneado={}", qrToken, escaneado);
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("❌ Error verificando estado QR: {}", e.getMessage(), e);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    /**
+     * Simular escaneo de QR para testing
+     */
+    @PostMapping("/qr/confirmar-escaneo/{qrToken}")
+    public ResponseEntity<?> confirmarEscaneoQR(@PathVariable("qrToken") String qrToken) {
+        try {
+            log.info("🧪 Simulando escaneo QR: {}", qrToken);
+            
+            boolean procesado = qrScanService.procesarEscaneoQR(qrToken);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", procesado);
+            response.put("message", procesado ? "QR escaneado exitosamente" : "QR no válido o ya procesado");
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("❌ Error confirmando escaneo QR: {}", e.getMessage(), e);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    private String generarPaginaConfirmacion(String qrToken, String amount) {
+        StringBuilder html = new StringBuilder();
+        html.append("<!DOCTYPE html>");
+        html.append("<html lang=\"es\">");
+        html.append("<head>");
+        html.append("<meta charset=\"UTF-8\">");
+        html.append("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
+        html.append("<title>QR Escaneado - Farmacia Dey</title>");
+        html.append("<style>");
+        html.append("body { font-family: Arial, sans-serif; text-align: center; padding: 20px; ");
+        html.append("background: linear-gradient(135deg, #4CAF50, #45a049); color: white; margin: 0; }");
+        html.append(".container { max-width: 400px; margin: 50px auto; background: white; color: #333; ");
+        html.append("padding: 30px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }");
+        html.append(".success-icon { font-size: 60px; color: #4CAF50; margin-bottom: 20px; }");
+        html.append(".amount { font-size: 24px; font-weight: bold; color: #2196F3; margin: 15px 0; }");
+        html.append(".message { font-size: 16px; line-height: 1.5; margin: 20px 0; }");
+        html.append(".qr-token { background: #f5f5f5; padding: 10px; border-radius: 5px; ");
+        html.append("font-family: monospace; font-size: 12px; margin: 10px 0; word-break: break-all; }");
+        html.append("</style>");
+        html.append("</head>");
+        html.append("<body>");
+        html.append("<div class=\"container\">");
+        html.append("<div class=\"success-icon\">✅</div>");
+        html.append("<h1>¡QR Escaneado!</h1>");
+        html.append("<div class=\"message\">Tu pago ha sido detectado exitosamente</div>");
+        if (amount != null) {
+            html.append("<div class=\"amount\">Monto: S/ ").append(amount).append("</div>");
+        }
+        html.append("<div class=\"message\">Puedes cerrar esta ventana.<br>La compra se completará automáticamente.</div>");
+        html.append("<div class=\"qr-token\">Token: ").append(qrToken).append("</div>");
+        html.append("</div>");
+        html.append("<script>");
+        html.append("setTimeout(() => {");
+        html.append("if (window.close) { window.close(); }");
+        html.append("else { document.body.innerHTML = '<div style=\"text-align:center;padding:50px;\"><h2>✅ Listo! Puedes cerrar esta ventana</h2></div>'; }");
+        html.append("}, 3000);");
+        html.append("</script>");
+        html.append("</body>");
+        html.append("</html>");
+        return html.toString();
+    }
+
+    private String generarPaginaError(String mensajeError) {
+        StringBuilder html = new StringBuilder();
+        html.append("<!DOCTYPE html>");
+        html.append("<html lang=\"es\">");
+        html.append("<head>");
+        html.append("<meta charset=\"UTF-8\">");
+        html.append("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
+        html.append("<title>Error QR - Farmacia Dey</title>");
+        html.append("<style>");
+        html.append("body { font-family: Arial, sans-serif; text-align: center; padding: 20px; ");
+        html.append("background: linear-gradient(135deg, #f44336, #d32f2f); color: white; margin: 0; }");
+        html.append(".container { max-width: 400px; margin: 50px auto; background: white; color: #333; ");
+        html.append("padding: 30px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }");
+        html.append(".error-icon { font-size: 60px; color: #f44336; margin-bottom: 20px; }");
+        html.append(".message { font-size: 16px; line-height: 1.5; margin: 20px 0; }");
+        html.append("</style>");
+        html.append("</head>");
+        html.append("<body>");
+        html.append("<div class=\"container\">");
+        html.append("<div class=\"error-icon\">❌</div>");
+        html.append("<h1>Error QR</h1>");
+        html.append("<div class=\"message\">").append(mensajeError).append("</div>");
+        html.append("<div class=\"message\">Por favor, intenta de nuevo o contacta con soporte.</div>");
+        html.append("</div>");
+        html.append("</body>");
+        html.append("</html>");
+        return html.toString();
     }
 }

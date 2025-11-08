@@ -170,7 +170,12 @@ public class PdfBoletaService {
         TransaccionPago transaccionSimulada = new TransaccionPago();
         transaccionSimulada.setId(999999L + compraId); // ID simulado único
         transaccionSimulada.setCompraId(compraId);
-        transaccionSimulada.setMetodoPagoId(1L); // Método de pago por defecto
+        // Obtener el método de pago real desde la compra
+        Long metodoPagoId = 1L; // Por defecto Yape/Plin
+        if (compraInfo.has("metodoPagoId") && !compraInfo.get("metodoPagoId").isNull()) {
+            metodoPagoId = compraInfo.get("metodoPagoId").asLong();
+        }
+        transaccionSimulada.setMetodoPagoId(metodoPagoId); // Método de pago real
         
         // Obtener el total real de la compra si está disponible
         BigDecimal montoReal = BigDecimal.valueOf(100.00); // Valor por defecto
