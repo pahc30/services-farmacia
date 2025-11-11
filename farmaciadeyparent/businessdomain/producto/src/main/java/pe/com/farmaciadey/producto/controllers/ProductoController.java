@@ -4,19 +4,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,7 +32,8 @@ public class ProductoController {
     @Autowired
     ProductoService service;
 
-    private final String uploadDir = "uploads";
+    @Value("${file.upload-dir:/app/uploads}")
+    private String uploadDir;
 
     @PostMapping(value = "/save-without-image")
     public ResponseEntity<Object> saveWithoutImage(@RequestBody Producto request) throws Exception {
@@ -198,55 +195,13 @@ public class ProductoController {
             Files.copy(file, Paths.get(uploadDir + "/" + fileName), StandardCopyOption.REPLACE_EXISTING);
 
             // Retornar la URL de acceso al archivo a través del gateway
-            String fileUrl = "http://localhost:9000/producto/api/producto/" + fileName;
+            // El context-path /producto se agrega automáticamente por Spring
+            String fileUrl = "http://localhost:9000/producto/images/" + fileName;
 
             return fileUrl;
         } catch (IOException e) {
             e.printStackTrace();
             return null;
-        }
-    }
-
-    @GetMapping("/{fileName}")
-    public ResponseEntity<Resource> getFile(@PathVariable("fileName") String fileName) {
-        try {
-            Path filePath = Paths.get(uploadDir + "/" + fileName);
-            Resource resource = new UrlResource(filePath.toUri());
-
-            if (resource.exists() || resource.isReadable()) {
-                // Detectar el tipo de contenido basado en la extensión del archivo
-                String contentType = "application/octet-stream";
-                String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-                
-                switch (fileExtension) {
-                    case "jpg":
-                    case "jpeg":
-                        contentType = "image/jpeg";
-                        break;
-                    case "png":
-                        contentType = "image/png";
-                        break;
-                    case "gif":
-                        contentType = "image/gif";
-                        break;
-                    case "webp":
-                        contentType = "image/webp";
-                        break;
-                    case "svg":
-                        contentType = "image/svg+xml";
-                        break;
-                }
-                
-                return ResponseEntity.status(HttpStatus.OK)
-                        .header(HttpHeaders.CONTENT_TYPE, contentType)
-                        .header(HttpHeaders.CACHE_CONTROL, "max-age=3600")
-                        .body(resource);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 

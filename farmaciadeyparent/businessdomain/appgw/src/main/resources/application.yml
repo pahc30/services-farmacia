@@ -28,27 +28,25 @@ spring:
             allowCredentials: true
       routes:
         - id: auth
-          uri: http://localhost:7011
+          uri: http://farmacia-auth:7011
           predicates:
             - Path=/auth/**
         - id: usuario
-          uri: http://localhost:7012
+          uri: http://farmacia-usuario:7012
           predicates:
             - Path=/usuario/**
         - id: producto
-          uri: http://localhost:7013
+          uri: http://farmacia-producto:7013
           predicates:
             - Path=/producto/**
         - id: metodopago
-          uri: http://localhost:7014
+          uri: http://farmacia-metodopago:7014
           predicates:
             - Path=/metodopago/**
         - id: compra
-          uri: http://localhost:7015
+          uri: http://farmacia-compra:7015
           predicates:
-            - Path=/compra/**
-
-# Configuración de logging para reducir warnings DNS en macOS
+            - Path=/compra/**# Configuración de logging para reducir warnings DNS en macOS
 logging:
   level:
     "[io.netty.resolver.dns.DnsServerAddressStreamProviders]": WARN

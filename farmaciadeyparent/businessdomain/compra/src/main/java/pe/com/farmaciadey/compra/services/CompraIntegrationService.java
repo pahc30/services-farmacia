@@ -33,7 +33,7 @@ public class CompraIntegrationService {
             .option(ChannelOption.SO_KEEPALIVE, true)
             .option(EpollChannelOption.TCP_KEEPIDLE, 300)
             .option(EpollChannelOption.TCP_KEEPINTVL, 60)
-            .responseTimeout(Duration.ofSeconds(1))
+            .responseTimeout(Duration.ofSeconds(10))
             .doOnConnected(connection -> {
                 connection.addHandlerLast(new ReadTimeoutHandler(5000, TimeUnit.MILLISECONDS));
                 connection.addHandlerLast(new WriteTimeoutHandler(5000, TimeUnit.MILLISECONDS));

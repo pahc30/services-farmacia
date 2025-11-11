@@ -89,7 +89,12 @@ public class PdfBoletaService {
         // Si no hay transacción completada, buscar cualquier transacción de la compra
         if (transaccionOpt.isEmpty()) {
             List<TransaccionPago> transacciones = transaccionRepository.findByCompraId(compraId);
+            log.info("🔍 Transacciones encontradas para compra {}: {}", compraId, transacciones.size());
             if (transacciones.isEmpty()) {
+                // Verificar si se obtuvo información de la compra antes de continuar
+                if (compraInfo == null || compraInfo.isNull() || compraInfo.size() == 0) {
+                    throw new RuntimeException("No se pudo obtener información de la compra " + compraId);
+                }
                 // Si no hay transacciones, crear una transacción simulada para la boleta
                 TransaccionPago transaccionSimulada = createSimulatedTransaction(compraId, compraInfo);
                 return generarPdfInterno(transaccionSimulada, compraInfo);
@@ -107,25 +112,30 @@ public class PdfBoletaService {
     private JsonNode obtenerInformacionCompra(Integer compraId) {
         try {
             log.info("🔄 Obteniendo información de compra: {}", compraId);
+            String url = "http://farmacia-compra:7015/compra/api/compra/find/" + compraId;
+            log.info("🌐 URL de solicitud: {}", url);
             
             String response = webClient.get()
-                .uri("http://farmacia-compra:7015/compra/api/compra/find/" + compraId)
+                .uri(url)
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
             
+            log.info("📄 Respuesta cruda del servicio de compra: {}", response);
+            
             JsonNode responseNode = objectMapper.readTree(response);
             if (responseNode.has("dato") && !responseNode.get("dato").isNull()) {
                 JsonNode compraData = responseNode.get("dato");
-                log.info("✅ Información de compra obtenida: ID {}", compraId);
+                log.info("✅ Información de compra obtenida: ID {} - Datos: {}", compraId, compraData.toString());
                 return compraData;
             }
             
-            log.warn("⚠️ No se encontró información de compra para ID: {}", compraId);
+            log.warn("⚠️ No se encontró información de compra para ID: {} - Respuesta: {}", compraId, responseNode.toString());
             return objectMapper.createObjectNode();
             
         } catch (Exception e) {
             log.error("❌ Error obteniendo información de compra {}: {}", compraId, e.getMessage());
+            e.printStackTrace();
             return objectMapper.createObjectNode();
         }
     }
@@ -192,6 +202,23 @@ public class PdfBoletaService {
         transaccionSimulada.setFechaPago(java.time.LocalDateTime.now());
         
         return transaccionSimulada;
+    }
+
+    private String obtenerMetodoPagoDesdeCatalogo(Long metodoPagoId) {
+        if (metodoPagoId == null) {
+            return null;
+        }
+
+        try {
+            Optional<Metodopago> metodoOpt = metodopagoRepository.findById(metodoPagoId.intValue());
+            if (metodoOpt.isPresent()) {
+                return metodoOpt.get().getTipo();
+            }
+        } catch (Exception e) {
+            log.warn("No se pudo obtener información del método de pago: {}", e.getMessage());
+        }
+
+        return null;
     }
 
     private byte[] generarPdfInterno(TransaccionPago transaccion, JsonNode compraInfo) throws Exception {
@@ -282,8 +309,8 @@ public class PdfBoletaService {
         infoTable.setWidths(new float[]{1, 2, 1, 2});
         
         // Obtener información del usuario desde la compra
-        String nombreCliente = "Cliente General";
-        String metodoPago = "Efectivo";
+    String nombreCliente = "Cliente General";
+    String metodoPago = "Efectivo";
         
         log.info("🔍 Información de compra recibida: {}", compraInfo != null ? compraInfo.toString() : "null");
         
@@ -316,16 +343,21 @@ public class PdfBoletaService {
             }
         }
         
-        // Obtener método de pago real
-        try {
-            if (transaccion.getMetodoPagoId() != null) {
-                Optional<Metodopago> metodoOpt = metodopagoRepository.findById(transaccion.getMetodoPagoId().intValue());
-                if (metodoOpt.isPresent()) {
-                    metodoPago = metodoOpt.get().getTipo();
-                }
+        // Intentar usar el texto enviado por el microservicio de compras para evitar inconsistencias
+        if (compraInfo != null && compraInfo.has("metodoPago") && !compraInfo.get("metodoPago").isNull()) {
+            String metodoPagoTexto = compraInfo.get("metodoPago").asText("").trim();
+            if (!metodoPagoTexto.isEmpty()) {
+                metodoPago = metodoPagoTexto;
             }
-        } catch (Exception e) {
-            log.warn("No se pudo obtener información del método de pago: {}", e.getMessage());
+        }
+
+        // Fallback al catálogo local cuando solo llega el ID
+        if ((metodoPago == null || metodoPago.isBlank()) && compraInfo != null && compraInfo.has("metodoPagoId") && !compraInfo.get("metodoPagoId").isNull()) {
+            metodoPago = obtenerMetodoPagoDesdeCatalogo(compraInfo.get("metodoPagoId").asLong());
+        }
+
+        if (metodoPago == null || metodoPago.isBlank()) {
+            metodoPago = obtenerMetodoPagoDesdeCatalogo(transaccion.getMetodoPagoId());
         }
         
         infoTable.addCell(new PdfPCell(new Phrase("Fecha:", normalFont)));

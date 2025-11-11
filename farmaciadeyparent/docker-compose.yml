@@ -79,10 +79,11 @@ services:
       - DB_PASSWORD=farmacia123
       - JWT_SECRET=miSecretoSuperSecreto123456789012345678901234567890
       - CORS_ORIGINS=http://localhost:4200
+      - UPLOAD_DIR=/app/uploads
     ports:
       - "7013:7013"
     volumes:
-      - postgres_data:/data
+      - producto_uploads:/app/uploads
     depends_on:
       farmacia-db:
         condition: service_healthy
@@ -165,3 +166,6 @@ volumes:
   postgres_data:
     external: true
     name: farmacia_postgres_data_permanent
+  producto_uploads:
+    driver: local
+    name: farmacia_producto_uploads

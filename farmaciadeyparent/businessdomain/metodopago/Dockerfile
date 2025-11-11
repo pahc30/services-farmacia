@@ -1,6 +1,9 @@
 # Multi-stage build for metodopago microservice
 FROM eclipse-temurin:21-jdk-alpine AS builder
 
+# Install Maven
+RUN apk add --no-cache maven
+
 # Set working directory
 WORKDIR /app
 
@@ -8,7 +11,7 @@ WORKDIR /app
 COPY . .
 
 # Build the application
-RUN ./mvnw clean package -pl businessdomain/metodopago -DskipTests
+RUN mvn clean package -pl businessdomain/metodopago -DskipTests
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine AS runtime

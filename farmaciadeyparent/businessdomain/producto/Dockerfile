@@ -1,6 +1,9 @@
 # Multi-stage build for producto microservice
 FROM eclipse-temurin:21-jdk-alpine AS builder
 
+# Install Maven
+RUN apk add --no-cache maven
+
 # Set working directory
 WORKDIR /app
 
@@ -8,7 +11,7 @@ WORKDIR /app
 COPY . .
 
 # Build the application
-RUN ./mvnw clean package -pl businessdomain/producto -DskipTests
+RUN mvn clean package -pl businessdomain/producto -DskipTests
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine AS runtime
@@ -20,8 +23,8 @@ RUN addgroup -g 1000 farmacia && \
 # Set working directory
 WORKDIR /app
 
-# Create uploads directory for file handling
-RUN mkdir -p uploads && chown -R farmacia:farmacia uploads
+# Create uploads directory for file handling with correct path
+RUN mkdir -p /app/uploads && chown -R farmacia:farmacia /app/uploads
 
 # Copy built JAR from builder stage
 COPY --from=builder /app/businessdomain/producto/target/*.jar app.jar
