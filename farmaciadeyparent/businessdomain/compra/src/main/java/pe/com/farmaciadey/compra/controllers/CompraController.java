@@ -60,7 +60,10 @@ public class CompraController {
 
             request.getDetalleCompra().forEach(x -> { 
                 updateStock(x.getProductoId(), x.getCantidad());
-                carritoCompraService.delete(x.getCarritoCompraId());
+                // Solo eliminar del carrito si tiene carritoCompraId (cuando viene desde web)
+                if (x.getCarritoCompraId() != null) {
+                    carritoCompraService.delete(x.getCarritoCompraId());
+                }
             });
 
             return new ResponseEntity<>(response, HttpStatus.CREATED);

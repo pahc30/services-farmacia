@@ -35,8 +35,8 @@ public class CompraIntegrationService {
             .option(EpollChannelOption.TCP_KEEPINTVL, 60)
             .responseTimeout(Duration.ofSeconds(10))
             .doOnConnected(connection -> {
-                connection.addHandlerLast(new ReadTimeoutHandler(5000, TimeUnit.MILLISECONDS));
-                connection.addHandlerLast(new WriteTimeoutHandler(5000, TimeUnit.MILLISECONDS));
+                connection.addHandlerLast(new ReadTimeoutHandler(10000, TimeUnit.MILLISECONDS));
+                connection.addHandlerLast(new WriteTimeoutHandler(10000, TimeUnit.MILLISECONDS));
             });
 
     public ProductoResponse getProducto(Integer productoId) {
