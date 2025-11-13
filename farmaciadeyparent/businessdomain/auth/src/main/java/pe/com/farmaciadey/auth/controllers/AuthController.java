@@ -72,7 +72,7 @@ public class AuthController {
                 UserInfo user = userService.findByUsername(request.getUsername());
                 if (user != null) {
                     JwtResponse jwtResponse = new JwtResponse();
-                    jwtResponse.setAccessToken(jwtService.GenerateToken(request.getUsername(), user.getRol()));
+                    jwtResponse.setAccessToken(jwtService.GenerateToken(request.getUsername(), user.getRol(), user.getId()));
                     jwtResponse.setUser(user);
                     return new ResponseEntity<>(new DataResponse(jwtResponse, Utils.REQUEST_OK), HttpStatus.OK);
                 }
