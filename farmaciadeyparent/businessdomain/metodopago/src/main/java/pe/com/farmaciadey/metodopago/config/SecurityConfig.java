@@ -44,14 +44,16 @@ public class SecurityConfig {
         return bean;
     }
 
-    @Bean
-    public FilterRegistrationBean<SecurityHeadersFilter> securityHeadersFilter() {
-        FilterRegistrationBean<SecurityHeadersFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new SecurityHeadersFilter());
-        registrationBean.addUrlPatterns("/*");
-        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
-        return registrationBean;
-    }
+    // 🏗️ ARQUITECTURA LIMPIA: Security Headers manejados ÚNICAMENTE por API Gateway
+    // Microservicio enfocado en lógica de negocio, no en headers HTTP
+    // @Bean
+    // public FilterRegistrationBean<SecurityHeadersFilter> securityHeadersFilter() {
+    //     FilterRegistrationBean<SecurityHeadersFilter> registrationBean = new FilterRegistrationBean<>();
+    //     registrationBean.setFilter(new SecurityHeadersFilter());
+    //     registrationBean.addUrlPatterns("/*");
+    //     registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
+    //     return registrationBean;
+    // }
 
     private static class SecurityHeadersFilter implements Filter {
         

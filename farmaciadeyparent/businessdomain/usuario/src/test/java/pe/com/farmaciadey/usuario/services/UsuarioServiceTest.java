@@ -7,6 +7,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import pe.com.farmaciadey.usuario.models.Usuario;
 import pe.com.farmaciadey.usuario.repository.UsuarioRepository;
 
@@ -73,12 +75,20 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void testUpdateSuccess() {
+    void testUpdateSuccess() throws Exception {
         Usuario u = new Usuario();
         u.setId(1);
+        u.setUsername("testuser");
         u.setPassword("newpass");
-        Optional<Usuario> opt = Optional.of(new Usuario());
+        
+        Usuario existing = new Usuario();
+        existing.setId(1);
+        existing.setUsername("testuser");
+        existing.setIdentificacion("12345678");
+        
+        Optional<Usuario> opt = Optional.of(existing);
         when(repository.findById(1)).thenReturn(opt);
+        when(repository.findByUsername("testuser")).thenReturn(existing);
         when(repository.save(any(Usuario.class))).thenAnswer(i -> i.getArgument(0));
         Usuario updated = service.update(u);
         assertNotNull(updated);
@@ -86,11 +96,58 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void testUpdateNotFound() {
+    void testUpdateNotFound() throws Exception {
         Usuario u = new Usuario();
         u.setId(99);
         when(repository.findById(99)).thenReturn(Optional.empty());
         assertNull(service.update(u));
+    }
+
+    @Test
+    void testAdminUpdateSuccess() throws Exception {
+        Usuario u = new Usuario();
+        u.setId(1);
+        u.setUsername("adminuser");
+        u.setIdentificacion("87654321");
+        u.setPassword("newpass");
+        
+        Usuario existing = new Usuario();
+        existing.setId(1);
+        existing.setUsername("olduser");
+        existing.setIdentificacion("12345678");
+        
+        Optional<Usuario> opt = Optional.of(existing);
+        when(repository.findById(1)).thenReturn(opt);
+        when(repository.findByUsername("adminuser")).thenReturn(null);
+        when(repository.findByIdentificacion("87654321")).thenReturn(null);
+        when(repository.save(any(Usuario.class))).thenAnswer(i -> i.getArgument(0));
+        Usuario updated = service.adminUpdate(u);
+        assertNotNull(updated);
+        assertEquals("87654321", updated.getIdentificacion());
+        assertTrue(new BCryptPasswordEncoder().matches("newpass", updated.getPassword()));
+    }
+
+    @Test
+    void testUpdateIdentificationChangeBlocked() throws Exception {
+        Usuario u = new Usuario();
+        u.setId(1);
+        u.setUsername("testuser");
+        u.setIdentificacion("87654321"); // Trying to change identification
+        
+        Usuario existing = new Usuario();
+        existing.setId(1);
+        existing.setUsername("testuser");
+        existing.setIdentificacion("12345678"); // Different identification
+        
+        Optional<Usuario> opt = Optional.of(existing);
+        when(repository.findById(1)).thenReturn(opt);
+        when(repository.findByUsername("testuser")).thenReturn(existing);
+        
+        Exception exception = assertThrows(Exception.class, () -> {
+            service.update(u);
+        });
+        
+        assertTrue(exception.getMessage().contains("La identificación no se puede modificar por seguridad"));
     }
 
     @Test

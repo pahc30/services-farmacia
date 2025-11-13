@@ -51,14 +51,16 @@ public class SecurityConfig {
      * Filtro para agregar Security Headers a todas las respuestas
      * Implementa OWASP Security Headers Best Practices
      */
-    @Bean
-    public FilterRegistrationBean<SecurityHeadersFilter> securityHeadersFilter() {
-        FilterRegistrationBean<SecurityHeadersFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new SecurityHeadersFilter());
-        registrationBean.addUrlPatterns("/*");
-        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
-        return registrationBean;
-    }
+    // 🏗️ ARQUITECTURA LIMPIA: Security Headers manejados ÚNICAMENTE por API Gateway
+    // Microservicio enfocado en lógica de negocio, no en headers HTTP
+    // @Bean
+    // public FilterRegistrationBean<SecurityHeadersFilter> securityHeadersFilter() {
+    //     FilterRegistrationBean<SecurityHeadersFilter> registrationBean = new FilterRegistrationBean<>();
+    //     registrationBean.setFilter(new SecurityHeadersFilter());
+    //     registrationBean.addUrlPatterns("/*");
+    //     registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
+    //     return registrationBean;
+    // }
 
     /**
      * Filtro personalizado para Security Headers
