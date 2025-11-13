@@ -42,6 +42,34 @@ public class SecurityConfig {
                 return config;
             }))
             .csrf(csrf -> csrf.disable())
+            .headers(headers -> headers
+                // 🔒 Security Headers - OWASP Best Practices
+                .contentTypeOptions(contentTypeOptions -> 
+                    contentTypeOptions.disable() // Evitar MIME sniffing
+                )
+                .xssProtection(xss -> 
+                    xss.disable() // Protección XSS (navegadores modernos usan CSP)
+                )
+                .frameOptions(frameOptions -> 
+                    frameOptions.deny() // Prevenir clickjacking
+                )
+                .httpStrictTransportSecurity(hsts -> hsts
+                    .includeSubDomains(true)
+                    .maxAgeInSeconds(31536000) // 1 año
+                )
+                .contentSecurityPolicy(csp -> csp
+                    .policyDirectives("default-src 'self'; " +
+                        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; " +
+                        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+                        "font-src 'self' https://fonts.gstatic.com data:; " +
+                        "img-src 'self' data: https:; " +
+                        "connect-src 'self' http://localhost:* https://*.onrender.com; " +
+                        "frame-ancestors 'none';")
+                )
+                .referrerPolicy(referrer -> 
+                    referrer.policy(org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
+                )
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/auth/api/auth/**",
