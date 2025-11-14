@@ -5,7 +5,7 @@ services:
     env: docker
     dockerfilePath: ./farmaciadeyparent/businessdomain/auth/Dockerfile
     dockerContext: ./farmaciadeyparent
-    region: oregon
+    region: virginia
     plan: free
     autoDeploy: false
     envVars:
@@ -14,7 +14,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        value: jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
+        value: "jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62?currentSchema=auth_schema"
       - key: DB_USERNAME
         value: farmacia
       - key: DB_PASSWORD
@@ -30,7 +30,7 @@ services:
     env: docker
     dockerfilePath: ./farmaciadeyparent/businessdomain/usuario/Dockerfile
     dockerContext: ./farmaciadeyparent
-    region: oregon
+    region: virginia
     plan: free
     autoDeploy: false
     envVars:
@@ -39,7 +39,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        value: jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
+        value: "jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62?currentSchema=usuario_schema"
       - key: DB_USERNAME
         value: farmacia
       - key: DB_PASSWORD
@@ -55,7 +55,7 @@ services:
     env: docker
     dockerfilePath: ./farmaciadeyparent/businessdomain/producto/Dockerfile
     dockerContext: ./farmaciadeyparent
-    region: oregon
+    region: virginia
     plan: free
     autoDeploy: false
     envVars:
@@ -64,7 +64,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        value: jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
+        value: "jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62?currentSchema=producto_schema"
       - key: DB_USERNAME
         value: farmacia
       - key: DB_PASSWORD
@@ -82,7 +82,7 @@ services:
     env: docker
     dockerfilePath: ./farmaciadeyparent/businessdomain/metodopago/Dockerfile
     dockerContext: ./farmaciadeyparent
-    region: oregon
+    region: virginia
     plan: free
     autoDeploy: false
     envVars:
@@ -91,7 +91,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        value: jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
+        value: "jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62?currentSchema=metodopago_schema"
       - key: DB_USERNAME
         value: farmacia
       - key: DB_PASSWORD
@@ -115,7 +115,7 @@ services:
     env: docker
     dockerfilePath: ./farmaciadeyparent/businessdomain/compra/Dockerfile
     dockerContext: ./farmaciadeyparent
-    region: oregon
+    region: virginia
     plan: free
     autoDeploy: false
     envVars:
@@ -124,7 +124,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        value: jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
+        value: "jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62?currentSchema=compra_schema"
       - key: DB_USERNAME
         value: farmacia
       - key: DB_PASSWORD
@@ -140,7 +140,7 @@ services:
     env: docker
     dockerfilePath: ./farmaciadeyparent/businessdomain/appgw/Dockerfile
     dockerContext: ./farmaciadeyparent
-    region: oregon
+    region: virginia
     plan: free
     autoDeploy: false
     envVars:
