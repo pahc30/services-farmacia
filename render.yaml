@@ -22,7 +22,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: CORS_ORIGINS
-        value: https://farmacia-frontend.onrender.com
+        value: https://farmaciadey.onrender.com
 
   # Usuario Microservice
   - type: web
@@ -47,7 +47,7 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: CORS_ORIGINS
-        value: https://farmacia-frontend.onrender.com
+        value: https://farmaciadey.onrender.com
 
   # Producto Microservice  
   - type: web
@@ -72,7 +72,7 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: CORS_ORIGINS
-        value: https://farmacia-frontend.onrender.com
+        value: https://farmaciadey.onrender.com
       - key: UPLOAD_DIR
         value: /app/uploads
 
@@ -99,7 +99,7 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: CORS_ORIGINS
-        value: https://farmacia-frontend.onrender.com
+        value: https://farmaciadey.onrender.com
       - key: STRIPE_API_KEY
         value: sk_test_default
       - key: TZ
@@ -132,7 +132,7 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: CORS_ORIGINS
-        value: https://farmacia-frontend.onrender.com
+        value: https://farmaciadey.onrender.com
 
   # Gateway Microservice (API Gateway)
   - type: web
@@ -149,7 +149,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: CORS_ORIGINS
-        value: https://farmacia-frontend.onrender.com
+        value: https://farmaciadey.onrender.com
       - key: AUTH_SERVICE_URL
         value: https://farmacia-auth.onrender.com
       - key: USUARIO_SERVICE_URL
