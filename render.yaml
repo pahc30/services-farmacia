@@ -2,7 +2,7 @@ databases:
   - name: farmacia-postgresql
     databaseName: farmaciadb
     user: farmacia
-    postgresMajorVersion: 15
+    postgresMajorVersion: 16
     region: oregon
 
 services:
