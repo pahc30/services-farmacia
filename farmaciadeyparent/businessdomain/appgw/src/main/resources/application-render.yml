@@ -1,0 +1,61 @@
+server:
+  port: ${PORT:9000}
+
+spring:
+  application:
+    name: appgw
+  main:
+    web-application-type: reactive
+  cloud:
+    compatibility-verifier:
+      enabled: false
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - ${CORS_ORIGINS:https://farmacia-frontend.onrender.com}
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+      routes:
+        - id: auth
+          uri: ${AUTH_SERVICE_URL:https://farmacia-auth.onrender.com}
+          predicates:
+            - Path=/auth/**
+        - id: usuario
+          uri: ${USUARIO_SERVICE_URL:https://farmacia-usuario.onrender.com}
+          predicates:
+            - Path=/usuario/**
+        - id: producto
+          uri: ${PRODUCTO_SERVICE_URL:https://farmacia-producto.onrender.com}
+          predicates:
+            - Path=/producto/**
+        - id: metodopago
+          uri: ${METODOPAGO_SERVICE_URL:https://farmacia-metodopago.onrender.com}
+          predicates:
+            - Path=/metodopago/**
+        - id: compra
+          uri: ${COMPRA_SERVICE_URL:https://farmacia-compra.onrender.com}
+          predicates:
+            - Path=/compra/**
+
+# Configuración de logging
+logging:
+  level:
+    "[io.netty.resolver.dns.DnsServerAddressStreamProviders]": WARN
+    "[io.netty.resolver.dns.macos]": WARN
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
