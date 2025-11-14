@@ -1,17 +1,10 @@
-databases:
-  - name: farmacia-postgresql
-    databaseName: farmaciadb
-    user: farmacia
-    postgresMajorVersion: 15
-    region: oregon
-
 services:
   # Auth Microservice
   - type: web
     name: farmacia-auth
     env: docker
-    dockerfilePath: ./businessdomain/auth/Dockerfile
-    dockerContext: .
+    dockerfilePath: ./farmaciadeyparent/businessdomain/auth/Dockerfile
+    dockerContext: ./farmaciadeyparent
     region: oregon
     plan: free
     autoDeploy: false
@@ -21,17 +14,11 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        fromDatabase:
-          name: farmacia-postgresql
-          property: connectionString
+        value: jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
       - key: DB_USERNAME
-        fromDatabase:
-          name: farmacia-postgresql
-          property: user
+        value: farmacia
       - key: DB_PASSWORD
-        fromDatabase:
-          name: farmacia-postgresql
-          property: password
+        value: 9k3emRoEFBdgNTuwVaqYOS9ppeHREht6
       - key: JWT_SECRET
         generateValue: true
       - key: CORS_ORIGINS
@@ -41,8 +28,8 @@ services:
   - type: web
     name: farmacia-usuario
     env: docker
-    dockerfilePath: ./businessdomain/usuario/Dockerfile
-    dockerContext: .
+    dockerfilePath: ./farmaciadeyparent/businessdomain/usuario/Dockerfile
+    dockerContext: ./farmaciadeyparent
     region: oregon
     plan: free
     autoDeploy: false
@@ -52,17 +39,11 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        fromDatabase:
-          name: farmacia-postgresql
-          property: connectionString
+        value: jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
       - key: DB_USERNAME
-        fromDatabase:
-          name: farmacia-postgresql
-          property: user
+        value: farmacia
       - key: DB_PASSWORD
-        fromDatabase:
-          name: farmacia-postgresql
-          property: password
+        value: 9k3emRoEFBdgNTuwVaqYOS9ppeHREht6
       - key: JWT_SECRET
         sync: false
       - key: CORS_ORIGINS
@@ -72,8 +53,8 @@ services:
   - type: web
     name: farmacia-producto
     env: docker
-    dockerfilePath: ./businessdomain/producto/Dockerfile
-    dockerContext: .
+    dockerfilePath: ./farmaciadeyparent/businessdomain/producto/Dockerfile
+    dockerContext: ./farmaciadeyparent
     region: oregon
     plan: free
     autoDeploy: false
@@ -83,17 +64,11 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        fromDatabase:
-          name: farmacia-postgresql
-          property: connectionString
+        value: jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
       - key: DB_USERNAME
-        fromDatabase:
-          name: farmacia-postgresql
-          property: user
+        value: farmacia
       - key: DB_PASSWORD
-        fromDatabase:
-          name: farmacia-postgresql
-          property: password
+        value: 9k3emRoEFBdgNTuwVaqYOS9ppeHREht6
       - key: JWT_SECRET
         sync: false
       - key: CORS_ORIGINS
@@ -105,8 +80,8 @@ services:
   - type: web
     name: farmacia-metodopago
     env: docker
-    dockerfilePath: ./businessdomain/metodopago/Dockerfile
-    dockerContext: .
+    dockerfilePath: ./farmaciadeyparent/businessdomain/metodopago/Dockerfile
+    dockerContext: ./farmaciadeyparent
     region: oregon
     plan: free
     autoDeploy: false
@@ -116,17 +91,11 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        fromDatabase:
-          name: farmacia-postgresql
-          property: connectionString
+        value: jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
       - key: DB_USERNAME
-        fromDatabase:
-          name: farmacia-postgresql
-          property: user
+        value: farmacia
       - key: DB_PASSWORD
-        fromDatabase:
-          name: farmacia-postgresql
-          property: password
+        value: 9k3emRoEFBdgNTuwVaqYOS9ppeHREht6
       - key: JWT_SECRET
         sync: false
       - key: CORS_ORIGINS
@@ -144,8 +113,8 @@ services:
   - type: web
     name: farmacia-compra
     env: docker
-    dockerfilePath: ./businessdomain/compra/Dockerfile
-    dockerContext: .
+    dockerfilePath: ./farmaciadeyparent/businessdomain/compra/Dockerfile
+    dockerContext: ./farmaciadeyparent
     region: oregon
     plan: free
     autoDeploy: false
@@ -155,17 +124,11 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        fromDatabase:
-          name: farmacia-postgresql
-          property: connectionString
+        value: jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
       - key: DB_USERNAME
-        fromDatabase:
-          name: farmacia-postgresql
-          property: user
+        value: farmacia
       - key: DB_PASSWORD
-        fromDatabase:
-          name: farmacia-postgresql
-          property: password
+        value: 9k3emRoEFBdgNTuwVaqYOS9ppeHREht6
       - key: JWT_SECRET
         sync: false
       - key: CORS_ORIGINS
@@ -175,8 +138,8 @@ services:
   - type: web
     name: farmacia-gateway
     env: docker
-    dockerfilePath: ./businessdomain/appgw/Dockerfile
-    dockerContext: .
+    dockerfilePath: ./farmaciadeyparent/businessdomain/appgw/Dockerfile
+    dockerContext: ./farmaciadeyparent
     region: oregon
     plan: free
     autoDeploy: false
