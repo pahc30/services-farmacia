@@ -1,0 +1,199 @@
+databases:
+  - name: farmacia-postgresql
+    databaseName: farmaciadb
+    user: farmacia
+    postgresMajorVersion: 15
+    region: oregon
+
+services:
+  # Auth Microservice
+  - type: web
+    name: farmacia-auth
+    env: docker
+    dockerfilePath: ./farmaciadeyparent/businessdomain/auth/Dockerfile
+    dockerContext: ./farmaciadeyparent
+    region: oregon
+    plan: free
+    autoDeploy: false
+    envVars:
+      - key: PORT
+        value: 7011
+      - key: SPRING_PROFILES_ACTIVE
+        value: render
+      - key: DATABASE_URL
+        fromDatabase:
+          name: farmacia-postgresql
+          property: connectionString
+      - key: DB_USERNAME
+        fromDatabase:
+          name: farmacia-postgresql
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: farmacia-postgresql
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: https://farmacia-frontend.onrender.com
+
+  # Usuario Microservice
+  - type: web
+    name: farmacia-usuario
+    env: docker
+    dockerfilePath: ./farmaciadeyparent/businessdomain/usuario/Dockerfile
+    dockerContext: ./farmaciadeyparent
+    region: oregon
+    plan: free
+    autoDeploy: false
+    envVars:
+      - key: PORT
+        value: 7012
+      - key: SPRING_PROFILES_ACTIVE
+        value: render
+      - key: DATABASE_URL
+        fromDatabase:
+          name: farmacia-postgresql
+          property: connectionString
+      - key: DB_USERNAME
+        fromDatabase:
+          name: farmacia-postgresql
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: farmacia-postgresql
+          property: password
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGINS
+        value: https://farmacia-frontend.onrender.com
+
+  # Producto Microservice  
+  - type: web
+    name: farmacia-producto
+    env: docker
+    dockerfilePath: ./farmaciadeyparent/businessdomain/producto/Dockerfile
+    dockerContext: ./farmaciadeyparent
+    region: oregon
+    plan: free
+    autoDeploy: false
+    envVars:
+      - key: PORT
+        value: 7013
+      - key: SPRING_PROFILES_ACTIVE
+        value: render
+      - key: DATABASE_URL
+        fromDatabase:
+          name: farmacia-postgresql
+          property: connectionString
+      - key: DB_USERNAME
+        fromDatabase:
+          name: farmacia-postgresql
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: farmacia-postgresql
+          property: password
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGINS
+        value: https://farmacia-frontend.onrender.com
+      - key: UPLOAD_DIR
+        value: /app/uploads
+
+  # MetodoPago Microservice
+  - type: web
+    name: farmacia-metodopago
+    env: docker
+    dockerfilePath: ./farmaciadeyparent/businessdomain/metodopago/Dockerfile
+    dockerContext: ./farmaciadeyparent
+    region: oregon
+    plan: free
+    autoDeploy: false
+    envVars:
+      - key: PORT
+        value: 7014
+      - key: SPRING_PROFILES_ACTIVE
+        value: render
+      - key: DATABASE_URL
+        fromDatabase:
+          name: farmacia-postgresql
+          property: connectionString
+      - key: DB_USERNAME
+        fromDatabase:
+          name: farmacia-postgresql
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: farmacia-postgresql
+          property: password
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGINS
+        value: https://farmacia-frontend.onrender.com
+      - key: STRIPE_API_KEY
+        value: sk_test_default
+      - key: TZ
+        value: America/Lima
+      - key: PAYPAL_CLIENT_ID
+        value: client_id_default
+      - key: PAYPAL_CLIENT_SECRET
+        value: client_secret_default
+
+  # Compra Microservice
+  - type: web
+    name: farmacia-compra
+    env: docker
+    dockerfilePath: ./farmaciadeyparent/businessdomain/compra/Dockerfile
+    dockerContext: ./farmaciadeyparent
+    region: oregon
+    plan: free
+    autoDeploy: false
+    envVars:
+      - key: PORT
+        value: 7015
+      - key: SPRING_PROFILES_ACTIVE
+        value: render
+      - key: DATABASE_URL
+        fromDatabase:
+          name: farmacia-postgresql
+          property: connectionString
+      - key: DB_USERNAME
+        fromDatabase:
+          name: farmacia-postgresql
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: farmacia-postgresql
+          property: password
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGINS
+        value: https://farmacia-frontend.onrender.com
+
+  # Gateway Microservice (API Gateway)
+  - type: web
+    name: farmacia-gateway
+    env: docker
+    dockerfilePath: ./farmaciadeyparent/businessdomain/appgw/Dockerfile
+    dockerContext: ./farmaciadeyparent
+    region: oregon
+    plan: free
+    autoDeploy: false
+    envVars:
+      - key: PORT
+        value: 9000
+      - key: SPRING_PROFILES_ACTIVE
+        value: render
+      - key: CORS_ORIGINS
+        value: https://farmacia-frontend.onrender.com
+      - key: AUTH_SERVICE_URL
+        value: https://farmacia-auth.onrender.com
+      - key: USUARIO_SERVICE_URL
+        value: https://farmacia-usuario.onrender.com
+      - key: PRODUCTO_SERVICE_URL
+        value: https://farmacia-producto.onrender.com
+      - key: METODOPAGO_SERVICE_URL
+        value: https://farmacia-metodopago.onrender.com
+      - key: COMPRA_SERVICE_URL
+        value: https://farmacia-compra.onrender.com
