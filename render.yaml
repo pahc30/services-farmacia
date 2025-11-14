@@ -7,7 +7,7 @@ services:
     dockerContext: ./farmaciadeyparent
     region: oregon
     plan: free
-    autoDeploy: false
+    autoDeploy: true
     envVars:
       - key: PORT
         value: 7011
@@ -32,7 +32,7 @@ services:
     dockerContext: ./farmaciadeyparent
     region: oregon
     plan: free
-    autoDeploy: false
+    autoDeploy: true
     envVars:
       - key: PORT
         value: 7012
@@ -57,7 +57,7 @@ services:
     dockerContext: ./farmaciadeyparent
     region: oregon
     plan: free
-    autoDeploy: false
+    autoDeploy: true
     envVars:
       - key: PORT
         value: 7013
@@ -84,7 +84,7 @@ services:
     dockerContext: ./farmaciadeyparent
     region: oregon
     plan: free
-    autoDeploy: false
+    autoDeploy: true
     envVars:
       - key: PORT
         value: 7014
@@ -117,7 +117,7 @@ services:
     dockerContext: ./farmaciadeyparent
     region: oregon
     plan: free
-    autoDeploy: false
+    autoDeploy: true
     envVars:
       - key: PORT
         value: 7015
@@ -142,7 +142,7 @@ services:
     dockerContext: ./farmaciadeyparent
     region: oregon
     plan: free
-    autoDeploy: false
+    autoDeploy: true
     envVars:
       - key: PORT
         value: 9000
