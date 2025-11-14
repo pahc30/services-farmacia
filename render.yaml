@@ -14,7 +14,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        value: postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
+        value: jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
       - key: DB_USERNAME
         value: farmacia
       - key: DB_PASSWORD
@@ -39,7 +39,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        value: postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
+        value: jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
       - key: DB_USERNAME
         value: farmacia
       - key: DB_PASSWORD
@@ -64,7 +64,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        value: postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
+        value: jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
       - key: DB_USERNAME
         value: farmacia
       - key: DB_PASSWORD
@@ -91,7 +91,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        value: postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
+        value: jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
       - key: DB_USERNAME
         value: farmacia
       - key: DB_PASSWORD
@@ -124,7 +124,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        value: postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
+        value: jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
       - key: DB_USERNAME
         value: farmacia
       - key: DB_PASSWORD
