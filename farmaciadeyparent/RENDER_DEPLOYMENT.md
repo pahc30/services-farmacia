@@ -62,7 +62,7 @@ git push origin feature/render-deployment
    - Copia la **External Database URL**
    - En tu terminal local, ejecuta:
    ```bash
-   export DATABASE_URL="postgresql://farmacia:password@host:port/farmaciadb"
+   export DATABASE_URL="postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62"
    ./scripts/init-render-db.sh
    ```
 
