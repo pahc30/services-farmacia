@@ -1,10 +1,3 @@
-databases:
-  - name: farmacia-postgresql
-    databaseName: farmaciadb
-    user: farmacia
-    postgresMajorVersion: 16
-    region: oregon
-
 services:
   # Auth Microservice
   - type: web
@@ -21,17 +14,11 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        fromDatabase:
-          name: farmacia-postgresql
-          property: connectionString
+        value: postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
       - key: DB_USERNAME
-        fromDatabase:
-          name: farmacia-postgresql
-          property: user
+        value: farmacia
       - key: DB_PASSWORD
-        fromDatabase:
-          name: farmacia-postgresql
-          property: password
+        value: 9k3emRoEFBdgNTuwVaqYOS9ppeHREht6
       - key: JWT_SECRET
         generateValue: true
       - key: CORS_ORIGINS
@@ -52,17 +39,11 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        fromDatabase:
-          name: farmacia-postgresql
-          property: connectionString
+        value: postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
       - key: DB_USERNAME
-        fromDatabase:
-          name: farmacia-postgresql
-          property: user
+        value: farmacia
       - key: DB_PASSWORD
-        fromDatabase:
-          name: farmacia-postgresql
-          property: password
+        value: 9k3emRoEFBdgNTuwVaqYOS9ppeHREht6
       - key: JWT_SECRET
         sync: false
       - key: CORS_ORIGINS
@@ -83,17 +64,11 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        fromDatabase:
-          name: farmacia-postgresql
-          property: connectionString
+        value: postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
       - key: DB_USERNAME
-        fromDatabase:
-          name: farmacia-postgresql
-          property: user
+        value: farmacia
       - key: DB_PASSWORD
-        fromDatabase:
-          name: farmacia-postgresql
-          property: password
+        value: 9k3emRoEFBdgNTuwVaqYOS9ppeHREht6
       - key: JWT_SECRET
         sync: false
       - key: CORS_ORIGINS
@@ -116,17 +91,11 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        fromDatabase:
-          name: farmacia-postgresql
-          property: connectionString
+        value: postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
       - key: DB_USERNAME
-        fromDatabase:
-          name: farmacia-postgresql
-          property: user
+        value: farmacia
       - key: DB_PASSWORD
-        fromDatabase:
-          name: farmacia-postgresql
-          property: password
+        value: 9k3emRoEFBdgNTuwVaqYOS9ppeHREht6
       - key: JWT_SECRET
         sync: false
       - key: CORS_ORIGINS
@@ -155,17 +124,11 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        fromDatabase:
-          name: farmacia-postgresql
-          property: connectionString
+        value: postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62
       - key: DB_USERNAME
-        fromDatabase:
-          name: farmacia-postgresql
-          property: user
+        value: farmacia
       - key: DB_PASSWORD
-        fromDatabase:
-          name: farmacia-postgresql
-          property: password
+        value: 9k3emRoEFBdgNTuwVaqYOS9ppeHREht6
       - key: JWT_SECRET
         sync: false
       - key: CORS_ORIGINS
