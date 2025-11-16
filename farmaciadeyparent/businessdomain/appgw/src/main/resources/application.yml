@@ -31,44 +31,24 @@ spring:
           uri: http://farmacia-auth:7011
           predicates:
             - Path=/auth/**
-          filters:
-            - RewritePath=/auth/(?<segment>.*), /api/auth/$\{segment}
         - id: usuario
           uri: http://farmacia-usuario:7012
           predicates:
             - Path=/usuario/**
-          filters:
-            - RewritePath=/usuario/(?<segment>.*), /api/usuarios/$\{segment}
-        - id: categoria
-          uri: http://farmacia-producto:7013
-          predicates:
-            - Path=/categoria/**
-          filters:
-            - RewritePath=/categoria/(?<segment>.*), /api/categoria/$\{segment}
         - id: producto
           uri: http://farmacia-producto:7013
           predicates:
             - Path=/producto/**
-          filters:
-            - RewritePath=/producto/(?<segment>.*), /api/producto/$\{segment}
         - id: metodopago
           uri: http://farmacia-metodopago:7014
           predicates:
             - Path=/metodopago/**
-          filters:
-            - RewritePath=/metodopago/(?<segment>.*), /$\{segment}
-        - id: carrito
-          uri: http://farmacia-compra:7015
-          predicates:
-            - Path=/carrito/**
-          filters:
-            - RewritePath=/carrito/(?<segment>.*), /api/carrito/$\{segment}
         - id: compra
           uri: http://farmacia-compra:7015
           predicates:
             - Path=/compra/**
-          filters:
-            - RewritePath=/compra/(?<segment>.*), /api/compra/$\{segment}# Configuración de logging para reducir warnings DNS en macOS
+
+# ConfiguraciÃ³n de logging para reducir warnings DNS en macOS
 logging:
   level:
     "[io.netty.resolver.dns.DnsServerAddressStreamProviders]": WARN

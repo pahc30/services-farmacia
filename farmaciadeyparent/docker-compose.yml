@@ -143,7 +143,6 @@ services:
       dockerfile: businessdomain/appgw/Dockerfile
     container_name: farmacia-gateway
     environment:
-      - SPRING_PROFILES_ACTIVE=render
       - CORS_ORIGINS=http://localhost:4200
     ports:
       - "9000:9000"
