@@ -5,7 +5,7 @@ services:
     env: docker
     dockerfilePath: ./farmaciadeyparent/businessdomain/auth/Dockerfile
     dockerContext: ./farmaciadeyparent
-    region: virginia
+    region: oregon
     plan: free
     autoDeploy: true
     envVars:
@@ -30,7 +30,7 @@ services:
     env: docker
     dockerfilePath: ./farmaciadeyparent/businessdomain/usuario/Dockerfile
     dockerContext: ./farmaciadeyparent
-    region: virginia
+    region: oregon
     plan: free
     autoDeploy: true
     envVars:
@@ -55,7 +55,7 @@ services:
     env: docker
     dockerfilePath: ./farmaciadeyparent/businessdomain/producto/Dockerfile
     dockerContext: ./farmaciadeyparent
-    region: virginia
+    region: oregon
     plan: free
     autoDeploy: true
     envVars:
@@ -82,7 +82,7 @@ services:
     env: docker
     dockerfilePath: ./farmaciadeyparent/businessdomain/metodopago/Dockerfile
     dockerContext: ./farmaciadeyparent
-    region: virginia
+    region: oregon
     plan: free
     autoDeploy: true
     envVars:
@@ -115,7 +115,7 @@ services:
     env: docker
     dockerfilePath: ./farmaciadeyparent/businessdomain/compra/Dockerfile
     dockerContext: ./farmaciadeyparent
-    region: virginia
+    region: oregon
     plan: free
     autoDeploy: true
     envVars:
@@ -140,7 +140,7 @@ services:
     env: docker
     dockerfilePath: ./farmaciadeyparent/businessdomain/appgw/Dockerfile
     dockerContext: ./farmaciadeyparent
-    region: virginia
+    region: oregon
     plan: free
     autoDeploy: true
     envVars:
