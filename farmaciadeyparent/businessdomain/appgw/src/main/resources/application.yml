@@ -48,6 +48,9 @@ spring:
           predicates:
             - Path=/compra/**
 
+app:
+  base-url: http://localhost:9000
+
 # ConfiguraciÃ³n de logging para reducir warnings DNS en macOS
 logging:
   level:

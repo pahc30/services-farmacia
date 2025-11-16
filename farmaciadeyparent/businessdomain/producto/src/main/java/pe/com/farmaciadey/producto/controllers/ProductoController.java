@@ -32,6 +32,8 @@ public class ProductoController {
     @Autowired
     ProductoService service;
 
+        @Value("${app.base-url}")
+        private String baseUrl;
     @Value("${file.upload-dir:/app/uploads}")
     private String uploadDir;
 
@@ -194,10 +196,8 @@ public class ProductoController {
         try (InputStream inputStream = file) {
             Files.copy(file, Paths.get(uploadDir + "/" + fileName), StandardCopyOption.REPLACE_EXISTING);
 
-            // Retornar la URL de acceso al archivo a través del gateway
-            // El context-path /producto se agrega automáticamente por Spring
-            String fileUrl = "http://localhost:9000/producto/images/" + fileName;
-
+            // Retornar la URL de acceso al archivo usando la variable baseUrl
+            String fileUrl = baseUrl + "/producto/images/" + fileName;
             return fileUrl;
         } catch (IOException e) {
             e.printStackTrace();

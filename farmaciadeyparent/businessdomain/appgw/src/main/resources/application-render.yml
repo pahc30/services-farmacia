@@ -60,6 +60,8 @@ spring:
           uri: ${COMPRA_SERVICE_URL:https://farmacia-compra-kdkd.onrender.com}
           predicates:
             - Path=/compra/**
+app:
+  base-url: https://farmacia-gateway-kdkd.onrender.com
 
 # ConfiguraciÃ³n de logging
 logging:
