@@ -31,22 +31,44 @@ spring:
           uri: ${AUTH_SERVICE_URL:https://farmacia-auth.onrender.com}
           predicates:
             - Path=/auth/**
+          filters:
+            - RewritePath=/auth/(?<segment>.*), /api/auth/$\{segment}
         - id: usuario
           uri: ${USUARIO_SERVICE_URL:https://farmacia-usuario.onrender.com}
           predicates:
             - Path=/usuario/**
+          filters:
+            - RewritePath=/usuario/(?<segment>.*), /api/usuarios/$\{segment}
+        - id: categoria
+          uri: ${PRODUCTO_SERVICE_URL:https://farmacia-producto.onrender.com}
+          predicates:
+            - Path=/categoria/**
+          filters:
+            - RewritePath=/categoria/(?<segment>.*), /api/categoria/$\{segment}
         - id: producto
           uri: ${PRODUCTO_SERVICE_URL:https://farmacia-producto.onrender.com}
           predicates:
             - Path=/producto/**
+          filters:
+            - RewritePath=/producto/(?<segment>.*), /api/producto/$\{segment}
         - id: metodopago
           uri: ${METODOPAGO_SERVICE_URL:https://farmacia-metodopago.onrender.com}
           predicates:
             - Path=/metodopago/**
+          filters:
+            - RewritePath=/metodopago/(?<segment>.*), /$\{segment}
+        - id: carrito
+          uri: ${COMPRA_SERVICE_URL:https://farmacia-compra.onrender.com}
+          predicates:
+            - Path=/carrito/**
+          filters:
+            - RewritePath=/carrito/(?<segment>.*), /api/carrito/$\{segment}
         - id: compra
           uri: ${COMPRA_SERVICE_URL:https://farmacia-compra.onrender.com}
           predicates:
             - Path=/compra/**
+          filters:
+            - RewritePath=/compra/(?<segment>.*), /api/compra/$\{segment}
 
 # Configuración de logging
 logging:
