@@ -16,6 +16,9 @@ spring:
         add-to-simple-url-handler-mapping: true
         corsConfigurations:
           '[/**]':
+            allowedOriginPatterns:
+              - "https://farmaciadey.onrender.com"
+              - "https://*.onrender.com"
             allowedOrigins:
               - ${CORS_ORIGINS:https://farmaciadey.onrender.com}
             allowedMethods:
@@ -24,8 +27,18 @@ spring:
               - PUT
               - DELETE
               - OPTIONS
-            allowedHeaders: "*"
+              - HEAD
+            allowedHeaders: 
+              - "*"
+            exposedHeaders:
+              - "Access-Control-Allow-Origin"
+              - "Access-Control-Allow-Methods"
+              - "Access-Control-Allow-Headers"
+              - "Access-Control-Max-Age"
+              - "Access-Control-Request-Headers"
+              - "Access-Control-Request-Method"
             allowCredentials: true
+            maxAge: 3600
       routes:
         - id: auth
           uri: ${AUTH_SERVICE_URL:https://farmacia-auth.onrender.com}

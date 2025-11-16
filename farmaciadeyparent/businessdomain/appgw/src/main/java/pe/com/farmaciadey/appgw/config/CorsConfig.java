@@ -19,6 +19,7 @@ public class CorsConfig {
         configuration.setAllowedOriginPatterns(List.of(
             "http://localhost:*",
             "http://127.0.0.1:*",
+            "https://farmaciadey.onrender.com",
             "https://*.onrender.com",
             "https://*.vercel.app",
             "https://*.netlify.app"
