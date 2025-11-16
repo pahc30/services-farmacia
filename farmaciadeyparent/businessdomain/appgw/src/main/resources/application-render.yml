@@ -41,23 +41,23 @@ spring:
             maxAge: 3600
       routes:
         - id: auth
-          uri: ${AUTH_SERVICE_URL:https://farmacia-auth.onrender.com}
+          uri: ${AUTH_SERVICE_URL:https://farmacia-auth-kdkd.onrender.com}
           predicates:
             - Path=/auth/**
         - id: usuario
-          uri: ${USUARIO_SERVICE_URL:https://farmacia-usuario.onrender.com}
+          uri: ${USUARIO_SERVICE_URL:https://farmacia-usuario-kdkd.onrender.com}
           predicates:
             - Path=/usuario/**
         - id: producto
-          uri: ${PRODUCTO_SERVICE_URL:https://farmacia-producto.onrender.com}
+          uri: ${PRODUCTO_SERVICE_URL:https://farmacia-producto-kdkd.onrender.com}
           predicates:
             - Path=/producto/**
         - id: metodopago
-          uri: ${METODOPAGO_SERVICE_URL:https://farmacia-metodopago.onrender.com}
+          uri: ${METODOPAGO_SERVICE_URL:https://farmacia-metodopago-kdkd.onrender.com}
           predicates:
             - Path=/metodopago/**
         - id: compra
-          uri: ${COMPRA_SERVICE_URL:https://farmacia-compra.onrender.com}
+          uri: ${COMPRA_SERVICE_URL:https://farmacia-compra-kdkd.onrender.com}
           predicates:
             - Path=/compra/**
 
