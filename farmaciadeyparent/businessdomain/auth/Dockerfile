@@ -35,9 +35,14 @@ USER farmacia
 # Expose port
 EXPOSE 7011
 
+# Install curl for health check
+USER root
+RUN apk add --no-cache curl
+USER farmacia
+
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:7011/auth/actuator/health || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-7011}/actuator/health || exit 1
 
 # Set Spring profile for Render
 ENV SPRING_PROFILES_ACTIVE=render
