@@ -48,13 +48,6 @@
       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
     </dependency>
 
-    <!-- H2 (tests / dev rápido) -->
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-
     <!-- MySQL (runtime real) -->
     <dependency>
       <groupId>com.mysql</groupId>
