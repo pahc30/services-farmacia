@@ -151,12 +151,12 @@ services:
       - key: CORS_ORIGINS
         value: https://farmaciadey.onrender.com
       - key: AUTH_SERVICE_URL
-        value: https://farmacia-auth.onrender.com
+        value: https://farmacia-auth-kdkd.onrender.com
       - key: USUARIO_SERVICE_URL
-        value: https://farmacia-usuario.onrender.com
+        value: https://farmacia-usuario-kdkd.onrender.com
       - key: PRODUCTO_SERVICE_URL
-        value: https://farmacia-producto.onrender.com
+        value: https://farmacia-producto-kdkd.onrender.com
       - key: METODOPAGO_SERVICE_URL
-        value: https://farmacia-metodopago.onrender.com
+        value: https://farmacia-metodopago-kdkd.onrender.com
       - key: COMPRA_SERVICE_URL
-        value: https://farmacia-compra.onrender.com
+        value: https://farmacia-compra-kdkd.onrender.com
