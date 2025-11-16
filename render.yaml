@@ -14,7 +14,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        value: "jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62?currentSchema=auth_schema"
+        value: "jdbc:postgresql://dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com:5432/farmaciadb_9q62?user=farmacia&password=9k3emRoEFBdgNTuwVaqYOS9ppeHREht6&currentSchema=auth_schema"
       - key: DB_USERNAME
         value: farmacia
       - key: DB_PASSWORD
@@ -39,7 +39,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        value: "jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62?currentSchema=usuario_schema"
+        value: "jdbc:postgresql://dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com:5432/farmaciadb_9q62?user=farmacia&password=9k3emRoEFBdgNTuwVaqYOS9ppeHREht6&currentSchema=usuario_schema"
       - key: DB_USERNAME
         value: farmacia
       - key: DB_PASSWORD
@@ -64,7 +64,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        value: "jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62?currentSchema=producto_schema"
+        value: "jdbc:postgresql://dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com:5432/farmaciadb_9q62?user=farmacia&password=9k3emRoEFBdgNTuwVaqYOS9ppeHREht6&currentSchema=producto_schema"
       - key: DB_USERNAME
         value: farmacia
       - key: DB_PASSWORD
@@ -91,7 +91,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        value: "jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62?currentSchema=metodopago_schema"
+        value: "jdbc:postgresql://dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com:5432/farmaciadb_9q62?user=farmacia&password=9k3emRoEFBdgNTuwVaqYOS9ppeHREht6&currentSchema=metodopago_schema"
       - key: DB_USERNAME
         value: farmacia
       - key: DB_PASSWORD
@@ -124,7 +124,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: DATABASE_URL
-        value: "jdbc:postgresql://farmacia:9k3emRoEFBdgNTuwVaqYOS9ppeHREht6@dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com/farmaciadb_9q62?currentSchema=compra_schema"
+        value: "jdbc:postgresql://dpg-d4bmaqripnbc73feb4j0-a.virginia-postgres.render.com:5432/farmaciadb_9q62?user=farmacia&password=9k3emRoEFBdgNTuwVaqYOS9ppeHREht6&currentSchema=compra_schema"
       - key: DB_USERNAME
         value: farmacia
       - key: DB_PASSWORD
