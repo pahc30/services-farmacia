@@ -197,7 +197,7 @@ public class ProductoController {
             Files.copy(file, Paths.get(uploadDir + "/" + fileName), StandardCopyOption.REPLACE_EXISTING);
 
             // Retornar la URL de acceso al archivo usando la variable baseUrl
-            String fileUrl = baseUrl + "/producto/images/" + fileName;
+            String fileUrl = baseUrl + "/api/producto/images/" + fileName;
             return fileUrl;
         } catch (IOException e) {
             e.printStackTrace();
