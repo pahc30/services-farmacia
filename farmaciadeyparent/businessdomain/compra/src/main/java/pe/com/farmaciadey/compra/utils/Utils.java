@@ -11,12 +11,12 @@ public class Utils {
     public static String BASE_URL_PRODUCTO;
     public static String BASE_URL_METODO_PAGO;
     
-    @Value("${service.producto.url:http://farmacia-producto:7013/producto}")
+    @Value("${service.producto.url:https://farmacia-producto-kdkd.onrender.com/producto}")
     public void setBaseUrlProducto(String url) {
         BASE_URL_PRODUCTO = url;
     }
     
-    @Value("${service.metodopago.url:http://farmacia-metodopago:7014/metodopago}")
+    @Value("${service.metodopago.url:https://farmacia-metodopago-kdkd.onrender.com/metodopago}")
     public void setBaseUrlMetodoPago(String url) {
         BASE_URL_METODO_PAGO = url;
     }
